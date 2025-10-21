@@ -29,6 +29,30 @@ module FPMul (
   wire [63:0] temp2;
   assign temp1 = {12'b1, M_1};
   assign temp2 = {12'b1, M_2};
+
+
+  // Adding exponnts E_1, E_2
+  wire [63:0] exponent_1;
+  wire cout1;
+  wire cout2;
+  wire [63:0] exponent_2;
+  addsub FPmul_exponent_sum (
+      .a({53'b0, E_1}),
+      .b({53'b0, E_2}),
+      .sel(1'b0),
+      .res(exponent_1),
+      .cout(cout1)
+  );
+  // Then subtracting bias
+  addsub FPmul_exponent_bias (
+      .a({exponent_1}),
+      .b({64'd1023}),
+      .sel(1'b1),
+      .res(exponent_2),
+      .cout(cout2)
+  );
+
+
   // Multiplying mantissas M_1 and M_2
   wire [127:0] mantissa_product;
   mul FPmul_mantissa (
@@ -52,6 +76,17 @@ module FPMul (
   assign R = (mantissa_product[105]) ? mantissa_product[51] : mantissa_product[50];
   assign S = (mantissa_product[105]) ? |mantissa_product[50:0] : |mantissa_product[49:0];
 
+  // Updating exponent (if needed) after normalizing
+  wire [63:0] exponent_3;
+  wire cout3;
+  addsub FPmul_exponent_norm (
+      .a(exponent_2),
+      .b(mantissa_product[105] ? 64'b1 : 64'b0),
+      .sel(1'b0),
+      .res(exponent_3),
+      .cout(cout3)
+  );
+
   assign round = (G & (R | S)) | (L & G & (~R) & (~S));
 
   wire [63:0] mantissa_rounded;
@@ -65,8 +100,19 @@ module FPMul (
   );
 
   wire [51:0] mantissa_renormalized;
+  wire [63:0] exponent_4;
+  wire cout4;
+  addsub FPmul_exponent_renorm (
+      .a(exponent_3),
+      .b((cout) ? 64'b1 : 64'b0),
+      .sel(1'b0),
+      .res(exponent_4),
+      .cout(cout4)
+  );
+
   assign mantissa_renormalized = (cout) ? mantissa_rounded[52:1] : mantissa_rounded[51:0];
   assign out[51:0] = mantissa_renormalized;
-  assign out[63:52] = 12'b0;
+  assign out[62:52] = exponent_4[10:0];
+  assign out[63] = S_1 ^ S_2;
 
 endmodule
