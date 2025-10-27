@@ -1,4 +1,4 @@
-`include "shift_amount.v"
+`include "FP_Adder/shift_amount.v"
 module FPAdder (
     input  [63:0] A,
     input  [63:0] B,

@@ -18,7 +18,7 @@ module FPAdder_tb;
 
   wire addorsub;
   // Instantiate the FPAdder
-  FPAdder uut (
+  FPSub uut (
       .A  (A),
       .B  (B),
       .out(out)
@@ -46,21 +46,21 @@ module FPAdder_tb;
     A = 64'h4043800000000000;  // 39.0
     B = 64'h4024000000000000;  // 10.0
     #10;
-    $display("Test 1: 39.0 + 10.0");
+    $display("Test 1: 39.0 - 10.0");
     $display("Result: %h", out);
 
     // Test case 2: positive and negative
     A = 64'h402e000000000000;  // 15.0
     B = 64'hc014000000000000;  // -5.0
     #10;
-    $display("Test 2: 15.0 + (-5.0)");
+    $display("Test 2: 15.0 - (-5.0)");
     $display("Result: %h", out);
 
     // Test case 3: positive and negative, larger negative
     A = 64'h4014000000000000;  // 5.0
     B = 64'hc02e000000000000;  // -15.0
     #10;
-    $display("Test 3: 5.0 + (-15.0)");
+    $display("Test 3: 5.0 - (-15.0)");
     $display("Result: %h", out);
 
 
@@ -68,49 +68,49 @@ module FPAdder_tb;
     A = 64'hc024000000000000;  // -10.0
     B = 64'hc014000000000000;  // -5.0
     #10;
-    $display("Test 4: -10.0 + (-5.0)");
+    $display("Test 4: -10.0 - (-5.0)");
     $display("Result: %h", out);
 
     // Test case 5: zero and positive
     A = 64'h0000000000000000;  // 0.0
     B = 64'h3ff0000000000000;  // 1.0
     #10;
-    $display("Test 5: 0.0 + 1.0");
+    $display("Test 5: 0.0 - 1.0");
     $display("Result: %h", out);
 
     // Test case 6: zero and negative
     A = 64'h0000000000000000;  // 0.0
     B = 64'hbff0000000000000;  // -1.0
     #10;
-    $display("Test 6: 0.0 + (-1.0)");
+    $display("Test 6: 0.0 - (-1.0)");
     $display("Result: %h", out);
 
     // Test case 7: large and small positive
     A = 64'h408f400000000000;  // 1000.0
     B = 64'h3f847ae147ae147b;  // 0.01
     #10;
-    $display("Test 7: 1000.0 + 0.01");
+    $display("Test 7: 1000.0 - 0.01");
     $display("Result: %h", out);
 
     // Test case 8: large positive and large negative
     A = 64'h408f400000000000;  // 1000.0
     B = 64'hc08f400000000000;  // -1000.0
     #10;
-    $display("Test 8: 1000.0 + (-1000.0)");
+    $display("Test 8: 1000.0 - (-1000.0)");
     $display("Result: %h", out);
 
     // Test case 9: small positive and small negative
     A = 64'h3f847ae147ae147b;  // 0.01
     B = 64'hbf847ae147ae147b;  // -0.01
     #10;
-    $display("Test 9: 0.01 + (-0.01)");
+    $display("Test 9: 0.01 - (-0.01)");
     $display("Result: %h", out);
 
     // Test case 10: small positive and small negative
     A = 64'h4004000000000000;  // 2.5
     B = 64'h400c000000000000;  // 3.5
     #10;
-    $display("Test 9: 2.5 + 3.5");
+    $display("Test 9: 2.5 - 3.5");
     $display("Result: %h", out);
 
 

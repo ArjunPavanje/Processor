@@ -1,4 +1,4 @@
-`include "normalize.v"
+`include "FP_Divider/normalize.v"
 
 module FPDiv (
     input  [63:0] N1,

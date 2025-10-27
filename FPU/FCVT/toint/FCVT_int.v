@@ -1,0 +1,32 @@
+module FCVT_int (
+    input  [63:0] fp,
+    output [63:0] in
+);
+
+  wire [51:0] M = fp[51:0];
+  wire [10:0] E = fp[62:52];
+  wire S = fp[63];
+
+  wire [11:0] exponent = {1'b0, E} - 12'd1023;
+
+  //wire too_large = |exponent[11:6];
+
+  wire too_large = (exponent[11] == 0) && (|exponent[10:6]);
+  wire [63:0] overflow = (S) ? 64'h8000000000000000 : 64'h7fffffffffffffff;
+
+  wire neg_exp = exponent[11];
+
+  wire [63:0] mantissa = {12'b1, M};  // 64-bit mantissa with leading 1
+
+  // Shift left if exponent >= 52, else shift right
+  wire [63:0] num_shifted_left = mantissa << (exponent[5:0] - 6'd52);
+  wire [63:0] num_shifted_right = mantissa >> (6'd52 - exponent[5:0]);
+
+  // Choose left/right shift without comparisons
+  wire [63:0] num = exponent[11] ? 64'd0 :  // exponent negative → value <1 → truncate to 0
+  exponent[10] ? num_shifted_left :  // exponent > 63 → use left shift (overflow handled naturally)
+  num_shifted_right;
+
+  assign in = (too_large) ? (overflow) : (S ? (~num + 64'b1) : num);
+
+endmodule
