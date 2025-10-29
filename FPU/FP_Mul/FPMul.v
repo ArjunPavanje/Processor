@@ -55,9 +55,34 @@ module FPMul (
   wire [63:0] exponent_4 = exponent_3 + ((cout) ? 64'b1 : 64'b0);
   wire [51:0] mantissa_renormalized = (cout) ? mantissa_rounded[52:1] : mantissa_rounded[51:0];
 
+  // Checking exponent overflow
+  wire exp_overflow = (exponent_4 >= 12'd2047);
+  wire exp_underflow = exponent_4[63] | (exponent_4 == 64'b0);
+
+  // Checking A, B for infinities
+  wire is_inf_1 = (E_1 == 11'h7FF) && (|M_1 == 1'b0);
+  wire is_inf_2 = (E_2 == 11'h7FF) && (|M_2 == 1'b0);
+
+
+  wire is_inf = ((is_inf_1 | is_inf_2) & !is_NaN) | exp_overflow;
+  wire is_NaN = (is_inf_1 & |E_2) | (is_inf_2 & |E_1);  // 0 * infinity
+  // Checking for multiplication by 0
+  wire is_zero = (~(|E_1)) | (~(|E_2)) | exp_underflow;
+
+
+  wire [63:0] out_1 = {S_1 ^ S_2, exponent_4[10:0], mantissa_renormalized};
+
+  wire [63:0] out_2 = 64'h7ff8000000000000;  // NaN
+  wire [63:0] out_3 = (is_inf_1)?((S_1)?(64'hFFF0000000000000):(64'h7FF0000000000000)):((is_inf_2)?((S_2)?(64'hFFF0000000000000):(64'h7FF0000000000000)):(64'b1));  // infinity
+
+
+  assign out = (is_zero) ? (64'b0) : ((is_NaN) ? (out_2) : ((is_inf) ? (out_3) : (out_1)));
+
+  /*
   // Final exponent and mantissa values
   assign out[51:0] = mantissa_renormalized;
   assign out[62:52] = exponent_4[10:0];
   assign out[63] = S_1 ^ S_2;
+  */
 
 endmodule

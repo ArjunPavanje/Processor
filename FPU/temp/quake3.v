@@ -1,5 +1,3 @@
-`include "/Users/arjunpavanje/Documents/Github/Processor/FPU/FSQRT/newton_ralphson.v"
-
 module quake3 (
     input  [63:0] x,
     output [63:0] y

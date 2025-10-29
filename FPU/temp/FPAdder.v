@@ -1,4 +1,3 @@
-`include "shift_amount.v"
 module FPAdder (
     input  [63:0] A,
     input  [63:0] B,
@@ -55,7 +54,7 @@ module FPAdder (
   shift_amount shift_amont (
       .A(temp_mantissa),
       .add(add),
-      .shift_amount(shift_amt_1)
+      .shift_amoont(shift_amt_1)
   );
 
   wire [53:0] sub_shift = temp_mantissa << shift_amt_1;

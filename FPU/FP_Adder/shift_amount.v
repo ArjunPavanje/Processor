@@ -1,7 +1,7 @@
 module shift_amount (
     input [53:0] A,
     input add,
-    output [6:0] shift_amount
+    output [6:0] shift_amoont
 );
   // For the case of Adddition
   wire [6:0] shift_amount_2 = (A[53]) ? 7'd1 : 7'd0;
@@ -63,5 +63,5 @@ module shift_amount (
                        (A[0])  ? 7'd52 : 11'd53;
 
   // Accordingly setting shift amount
-  assign shift_amount = (add) ? shift_amount_2 : shift_amount_1;
+  assign shift_amoont = (add) ? shift_amount_2 : shift_amount_1;
 endmodule

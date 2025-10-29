@@ -1,6 +1,3 @@
-`include "/Users/arjunpavanje/Documents/Github/Processor/FPU/FP_Adder/FPAdder.v"
-`include "/Users/arjunpavanje/Documents/Github/Processor/FPU/FP_Mul/FPMul.v"
-
 module newton_ralphson (
     input  [63:0] x,
     input  [63:0] y,
