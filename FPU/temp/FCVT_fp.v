@@ -19,6 +19,7 @@ module FCVT_fp (
   wire [63:0] mantissa_shifted = mod << (11'd63 - index);
   wire [51:0] M = (|mod) ? mantissa_shifted[62:11] : 52'd0;
 
-  assign out = {S, E, M};
+  wire is_zero = ~|in[63:0];
+  assign out = (is_zero) ? (64'd0) : ({S, E, M});
 
 endmodule
