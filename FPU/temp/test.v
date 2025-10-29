@@ -2,8 +2,8 @@ module fpu_cntrl_tb;
   reg  [31:0] instruction;
   wire [ 2:0] fpu_op;
   wire [63:0] out;
-  wire [63:0] N1 = 64'h4048800000000000;  //49
-  wire [63:0] N2 = 64'h402b000000000000;  //13.5
+  wire [63:0] in1 = 64'h4048800000000000;  //49
+  wire [63:0] in2 = 64'h402b000000000000;  //13.5
 
   // Instantiate DUT
   fpu_cntrl dut (
@@ -11,8 +11,8 @@ module fpu_cntrl_tb;
       .fpu_op(fpu_op)
   );
   FPU uut (
-      .N1(N1),
-      .N2(N2),
+      .in1(in1),
+      .in2(in2),
       .fpu_op(fpu_op),
       .out(out)
   );

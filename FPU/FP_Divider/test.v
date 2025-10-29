@@ -16,6 +16,9 @@ module FPDiv_tb;
       .N2 (N2),
       .out(out)
   );
+  wire [127:0] mantissa_product = uut.mantissa_product;
+  wire [ 11:0] exponent_3 = uut.exponent_3;
+  wire [ 63:0] mantissa_normalized = uut.mantissa_normalized;
 
   initial begin
     $dumpfile("dump.vcd");
@@ -65,6 +68,9 @@ module FPDiv_tb;
     expected = 64'h3fd3333333333333;
     #10;
     total = total + 1;
+    $display("Quotient: %b", mantissa_product);
+    $display("Exponent_3: %b", exponent_3);
+    $display("Normalized Mantissa: %b", mantissa_normalized);
     if (out == expected) begin
       passed = passed + 1;
       $display("Test  3: PASS - 1.5 / 5.0 = 0.3");
@@ -287,7 +293,7 @@ module FPDiv_tb;
     // Test 18: pos / -0 = -inf
     N1 = 64'h4014000000000000;
     N2 = 64'h8000000000000000;
-    expected = 64'h7ff0000000000000;
+    expected = 64'hfff0000000000000;
     #10;
     total = total + 1;
     if (out == expected) begin
@@ -302,7 +308,7 @@ module FPDiv_tb;
     // Test 19: neg / -0 = +inf
     N1 = 64'hc014000000000000;
     N2 = 64'h8000000000000000;
-    expected = 64'hfff0000000000000;
+    expected = 64'h7ff0000000000000;
     #10;
     total = total + 1;
     if (out == expected) begin

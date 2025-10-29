@@ -9,8 +9,8 @@
 */
 
 module FPU (
-    input wire [63:0] N1,
-    input wire [63:0] N2,
+    input wire [63:0] in1,
+    input wire [63:0] in2,
 
     input wire [2:0] fpu_op,
 
@@ -26,36 +26,36 @@ module FPU (
   wire [63:0] fcvt_dl;
 
   FPAdder fp_addition (
-      .A  (N1),
-      .B  (N2),
+      .in1(in1),
+      .in2(in2),
       .out(sum)
   );
   FPSub fp_subtraction (
-      .A  (N1),
-      .B  (N2),
+      .in1(in1),
+      .in2(in2),
       .out(difference)
   );
   FPMul fp_multiplication (
-      .N1 (N1),
-      .N2 (N2),
+      .in1(in1),
+      .in2(in2),
       .out(product)
   );
   FPDiv fp_division (
-      .N1 (N1),
-      .N2 (N2),
+      .in1(in1),
+      .in2(in2),
       .out(quotient)
   );
   FSQRT fp_sqrt (
-      .x(N1),
-      .y(sqrt)
+      .in (in1),
+      .out(sqrt)
   );
   FCVT_int fp_ld (
-      .fp(N1),
-      .in(fcvt_ld)
+      .in (in1),
+      .out(fcvt_ld)
   );
   FCVT_fp fp_dl (
-      .in(N1),
-      .fp(fcvt_dl)
+      .in (in1),
+      .out(fcvt_dl)
   );
 
   always @(*) begin

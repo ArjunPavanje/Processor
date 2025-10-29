@@ -34,9 +34,9 @@ module FPAdder (
   wire [51:0] M2 = (~cntrl) ? M_A : M_B;
   wire [11:0] exp_1 = (cntrl) ? {1'b0, E_B} : {1'b0, E_A};
 
+  wire [52:0] M1 = {(cntrl) ? |E_A : |E_B, M};
+  wire [52:0] M_2 = {(cntrl) ? |E_B : |E_A, M2};
   wire [52:0] M_1 = M1 >> shift_amt;
-  wire [52:0] M1 = {1'b1, M};
-  wire [52:0] M_2 = {1'b1, M2};
 
 
   // Performing addition/subtraction
@@ -99,8 +99,10 @@ module FPAdder (
 
   wire [63:0] out_1 = {temp3, exp_3[10:0], cout ? rounded_mantissa[52:1] : rounded_mantissa[51:0]};
   wire [63:0] out_2 = 64'h7ff8000000000000;  // NaN
-  wire [63:0] out_3 = (is_inf_A)?((S_A)?(64'hFFF0000000000000):(64'h7FF0000000000000)):((is_inf_B)?((S_B)?(64'hFFF0000000000000):(64'h7FF0000000000000)):(64'b1));  // infinity
-
+  //wire [63:0] out_3 = (is_inf_A)?((S_A)?(64'hFFF0000000000000):(64'h7FF0000000000000)):((is_inf_B)?((S_B)?(64'hFFF0000000000000):(64'h7FF0000000000000)):(64'b1));  // infinity
+  wire [63:0] out_3 = (is_inf_A) ? ((S_A) ? (64'hFFF0000000000000) : (64'h7FF0000000000000)) :
+                    ((is_inf_B) ? ((S_B) ? (64'hFFF0000000000000) : (64'h7FF0000000000000)) :
+                    ((temp3) ? (64'hFFF0000000000000) : (64'h7FF0000000000000)));
 
   assign out = (is_NaN) ? (out_2) : ((is_inf) ? (out_3) : (out_1));
   /*

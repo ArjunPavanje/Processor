@@ -261,7 +261,7 @@ module FPAdder_tb;
     // Test 38: 0.001 + 0.002 = 0.003
     test_A[38] = 64'h3f50624dd2f1a9fc;
     test_B[38] = 64'h3f60624dd2f1a9fc;
-    expected[38] = 64'h3f68a4395810625;
+    expected[38] = 64'h3f689374bc6a7efa;
     test_name[38] = "0.001 + 0.002 = 0.003";
 
     // Test 39: 555.555 + 444.445 = 1000.0

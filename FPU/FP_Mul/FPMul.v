@@ -21,8 +21,8 @@ module FPMul (
   assign S_2 = N2[63];
 
 
-  wire [63:0] temp1 = {12'b1, M_1};
-  wire [63:0] temp2 = {12'b1, M_2};
+  wire [63:0] temp1 = {11'b0, |E_1, M_1};
+  wire [63:0] temp2 = {11'b0, |E_2, M_2};
 
 
   // Adding exponnts E_1, E_2 and subtracting bias
@@ -30,7 +30,7 @@ module FPMul (
   wire [63:0] exponent_2 = exponent_1 - 64'd1023;
 
   // Multiplying mantissas M_1 and M_2
-  wire [127:0] mantissa_product = {64'b0, 12'b1, M_1} * {64'b0, 12'b1, M_2};
+  wire [127:0] mantissa_product = {64'b0, 11'b0, |E_1, M_1} * {64'b0, 11'b0, |E_2, M_2};
 
   // Normalizing mantissa (LSB, Guard, Round, Sticky)
   // Round to nearest even has been followed
@@ -45,7 +45,11 @@ module FPMul (
   wire [63:0] exponent_3 = exponent_2 + (mantissa_product[105] ? 64'b1 : 64'b0);
 
   // To add up or not to reach nearest even
-  wire round = (G & (R | S)) | (L & G & (~R) & (~S));
+
+  //wire round = (G & (R | S)) | (L & G & (~R) & (~S));
+  wire round = G & (L | R | S);
+
+
   wire [64:0] mantissa_rounded_cout = {12'b0, mantissa_normalized} + (round ? 65'b1 : 65'b0);
 
   // Renormalizing
@@ -56,8 +60,10 @@ module FPMul (
   wire [51:0] mantissa_renormalized = (cout) ? mantissa_rounded[52:1] : mantissa_rounded[51:0];
 
   // Checking exponent overflow
-  wire exp_overflow = (exponent_4 >= 12'd2047);
-  wire exp_underflow = exponent_4[63] | (exponent_4 == 64'b0);
+  //wire exp_overflow = (exponent_4 >= 12'd2047);
+  wire exp_overflow = (exponent_4[10:0] >= 11'd2047) & ~exponent_4[63];
+
+  wire exp_underflow = exponent_4[63];
 
   // Checking A, B for infinities
   wire is_inf_1 = (E_1 == 11'h7FF) && (|M_1 == 1'b0);
@@ -73,7 +79,8 @@ module FPMul (
   wire [63:0] out_1 = {S_1 ^ S_2, exponent_4[10:0], mantissa_renormalized};
 
   wire [63:0] out_2 = 64'h7ff8000000000000;  // NaN
-  wire [63:0] out_3 = (is_inf_1)?((S_1)?(64'hFFF0000000000000):(64'h7FF0000000000000)):((is_inf_2)?((S_2)?(64'hFFF0000000000000):(64'h7FF0000000000000)):(64'b1));  // infinity
+  //wire [63:0] out_3 = (is_inf_1)?((S_1)?(64'hFFF0000000000000):(64'h7FF0000000000000)):((is_inf_2)?((S_2)?(64'hFFF0000000000000):(64'h7FF0000000000000)):(64'b1));  // infinity
+  wire [63:0] out_3 = {S_1 ^ S_2, 11'h7FF, 52'h0};
 
 
   assign out = (is_zero) ? (64'b0) : ((is_NaN) ? (out_2) : ((is_inf) ? (out_3) : (out_1)));

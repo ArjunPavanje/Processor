@@ -1,9 +1,9 @@
 module mantissa_normalize (
     input wire [127:0] mantissa_product,
-    input wire [10:0] exponent_init,
+    input wire [11:0] exponent_init,
     output wire [63:0] mantissa_normalized,
     output wire round,
-    output wire [10:0] exponent_modified
+    output wire [11:0] exponent_modified
 );
 
   // ---- Generating lead_index via MUX tree ----
@@ -142,7 +142,7 @@ module mantissa_normalize (
   wire left_shift = (lead_index < 7'd52);
   wire [127:0] if_left_shifted = mantissa_product << (7'd52 - lead_index);
   wire [127:0] if_right_shifted = mantissa_product << (lead_index - 7'd52);
-  wire [10:0] shift_amt = (left_shift) ? (11'd52 - lead_index) : (lead_index - 11'd52);
+  wire [11:0] shift_amt = (left_shift) ? (11'd52 - lead_index) : (lead_index - 11'd52);
   // Updating exponent
   assign exponent_modified = (left_shift)?(exponent_init - shift_amt):(exponent_init + shift_amt);
 

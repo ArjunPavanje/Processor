@@ -1,6 +1,6 @@
 module FCVT_fp (
     input  [63:0] in,
-    output [63:0] fp
+    output [63:0] out
 );
   // Checking sign
   wire S = in[63];
@@ -19,6 +19,6 @@ module FCVT_fp (
   wire [63:0] mantissa_shifted = mod << (11'd63 - index);
   wire [51:0] M = (|mod) ? mantissa_shifted[62:11] : 52'd0;
 
-  assign fp = {S, E, M};
+  assign out = {S, E, M};
 
 endmodule

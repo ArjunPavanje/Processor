@@ -1,11 +1,11 @@
 module FCVT_int (
-    input  [63:0] fp,
-    output [63:0] in
+    input  [63:0] in,
+    output [63:0] out
 );
 
-  wire [51:0] M = fp[51:0];
-  wire [10:0] E = fp[62:52];
-  wire S = fp[63];
+  wire [51:0] M = in[51:0];
+  wire [10:0] E = in[62:52];
+  wire S = in[63];
 
   wire [11:0] exponent = {1'b0, E} - 12'd1023;
 
@@ -27,6 +27,6 @@ module FCVT_int (
   exponent[10] ? num_shifted_left :  // exponent > 63 → use left shift (overflow handled naturally)
   num_shifted_right;
 
-  assign in = (too_large) ? (overflow) : (S ? (~num + 64'b1) : num);
+  assign out = (too_large) ? (overflow) : (S ? (~num + 64'b1) : num);
 
 endmodule
