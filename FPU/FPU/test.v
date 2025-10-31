@@ -1,6 +1,6 @@
 module fpu_cntrl_tb;
   reg  [31:0] instruction;
-  wire [ 2:0] fpu_op;
+  wire [ 4:0] fpu_op;
   wire [63:0] out;
   wire [63:0] in1 = 64'h4048800000000000;  //49
   wire [63:0] in2 = 64'h402b000000000000;  //13.5

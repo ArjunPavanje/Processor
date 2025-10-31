@@ -12,8 +12,10 @@ module FPU (
     input wire [63:0] in1,
     input wire [63:0] in2,
 
-    input wire [2:0] fpu_op,
+    input wire [4:0] fpu_op,
 
+    output reg fpu_rd,
+    output reg fpu_rs1,
     output reg [63:0] out
 );
 
@@ -60,13 +62,52 @@ module FPU (
 
   always @(*) begin
     case (fpu_op)
-      3'b000: out = sum;
-      3'b001: out = difference;
-      3'b010: out = product;
-      3'b011: out = quotient;
-      3'b100: out = sqrt;
-      3'b101: out = fcvt_ld;
-      3'b110: out = fcvt_dl;
+      5'b00000: begin
+        out = sum;
+        fpu_rd = 1;
+        fpu_rs1 = 1;
+      end
+      5'b00001: begin
+        out = difference;
+        fpu_rd = 1;
+        fpu_rs1 = 1;
+      end
+      5'b00010: begin
+        out = product;
+        fpu_rs1 = 1;
+        fpu_rd = 1;
+      end
+      5'b00011: begin
+        out = quotient;
+        fpu_rd = 1;
+        fpu_rs1 = 1;
+      end
+      5'b00100: begin
+        out = sqrt;
+        fpu_rd = 1;
+        fpu_rs1 = 1;
+      end
+      5'b00101: begin
+        out = fcvt_ld;
+        fpu_rd = 0;
+        fpu_rs1 = 1;
+      end
+      5'b00110: begin
+        out = fcvt_dl;
+        fpu_rd = 1;
+        fpu_rs1 = 0;
+      end
+      5'b00111: begin
+        // fmv.x.d
+        out = in1;
+        fpu_rd = 0;
+        fpu_rs1 = 1;
+      end
+      5'b01000: begin
+        out = in1;
+        fpu_rd = 1;
+        fpu_rs1 = 0;
+      end
     endcase
   end
 

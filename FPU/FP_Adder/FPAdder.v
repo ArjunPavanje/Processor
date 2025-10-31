@@ -36,6 +36,19 @@ module FPAdder (
 
   wire [52:0] M1 = {(cntrl) ? |E_A : |E_B, M};
   wire [52:0] M_2 = {(cntrl) ? |E_B : |E_A, M2};
+
+
+  // Before shifting smaller number, properly accounting for truncation so it doesn't bit me in the ass later
+  wire [52:0] temp_1 = M1 >> (shift_amt) - 11'd1;
+  wire G_1 = (shift_amt >= 11'd1) ? (temp_1[0]) : (1'b0);  // Guard Bit
+
+  wire [52:0] temp_2 = M1 >> (shift_amt) - 11'd2;
+  wire R_1 = (shift_amt >= 11'd2) ? (temp_2[0]) : (1'b0);  // Round Bit
+
+  wire [52:0] temp_3 = M1 << 11'd53 - (shift_amt);
+  wire [52:0] shifted = temp3 >> (11'd53) - shift_amt;
+  wire S_1 = (shift_amt >= 11'd3) ? (|temp_3) : (1'b0);  // Sticky Bit
+
   wire [52:0] M_1 = M1 >> shift_amt;
 
 
@@ -60,6 +73,8 @@ module FPAdder (
 
   wire [53:0] sub_shift = temp_mantissa << shift_amt_1;
   wire [53:0] add_shift = temp_mantissa >> shift_amt_1;
+
+
   wire [52:0] shifted_mantissa = (add) ? (add_shift[52:0]) : (sub_shift[52:0]);
   wire [52:0] shifted_temp_mantissa;
 
@@ -68,21 +83,28 @@ module FPAdder (
   wire [11:0] sub_exp = exp_1 - (shift_amt_1);
   wire [11:0] exp_2 = add ? add_exp : sub_exp;
 
-  /*
-  // Rounding and renormalizing (updating exponent accordingly)
-  wire [53:0] rounded_mantissa_cout = shifted_mantissa + {52'b0, temp_mantissa[0] & temp_mantissa[1]};
+  // Rounding Logic
+  //wire L = shifted_mantissa[1];
+  //wire G = shifted_mantissa[0];
+  //
+  wire L = (temp_mantissa[53]) ? (temp_mantissa[1]) : (temp_mantissa[0]);
+  wire G = (temp_mantissa[53]) ? (temp_mantissa[0]) : G_1;
+  wire R = (temp_mantissa[53]) ? (G_1) : R_1;
+  wire S = (temp_mantissa[53]) ? (R_1 | S_1) : S_1;
+
+  wire round_add = (add) ? ((L & G & (~R) & (~S)) | (G & (R | S))) : 1'b0;
+  wire round_sub = ((G_1 == 1)) ? (1'b1) : (1'b0);
+  //wire round = (add) ? (temp_mantissa[53] ? ((G & L) ? (1'b1) : (1'b0)) : (1'b0)) : 1'b0;
+
+
+  wire [53:0] rounded_mantissa_cout = (add)?(shifted_mantissa + {52'd0, round_add}):(shifted_mantissa - {52'd0, round_sub});
+
+
+  //wire [53:0] rounded_mantissa_cout =
+  //shifted_mantissa + (add?{52'd0, round_add}:{52'd0});
   wire [52:0] rounded_mantissa = rounded_mantissa_cout[52:0];
   wire cout = rounded_mantissa_cout[53];
-  wire [11:0] exp_rnorm = exp_2 + (cout ? 12'b1 : 12'b0);
-  */
-
-  wire L = shifted_mantissa[0];
-  wire G = add ? add_shift[0] : sub_shift[0];
-  wire [53:0] rounded_mantissa_cout = shifted_mantissa + {52'b0, G};
-  wire [52:0] rounded_mantissa = rounded_mantissa_cout[52:0];
-  wire cout = rounded_mantissa_cout[53];
-  wire [11:0] exp_rnorm = exp_2 + (cout ? 12'b1 : 12'b0);
-
+  wire [11:0] exp_rnorm = exp_2 + (cout ? 12'd1 : 12'd0);
 
   // Checking for 0's
   wire [11:0] exp_3 = zer0 ? 12'b0 : exp_rnorm;

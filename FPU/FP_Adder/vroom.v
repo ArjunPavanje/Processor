@@ -11,20 +11,18 @@ module FPAdder_tb;
   integer i;
 
   // Instantiate the FPAdder
-  FPAdder uut (
+  new_FPAdder uut (
       .A  (A),
       .B  (B),
       .out(out)
   );
-  wire [53:0] temp_mantissa = uut.temp_mantissa;
-  wire [52:0] M_1 = uut.M_1;
-  wire [52:0] M_2 = uut.M_2;
-  wire add = uut.add;
-  wire G_1 = uut.G_1;
-  wire R_1 = uut.S_1;
-  wire S_1 = uut.S_1;
-  wire round_sub = uut.round_sub;
-  wire [53:0] shifted_mantissa = uut.shifted_mantissa;
+  wire [106:0] temp_mantissa = uut.temp_mantissa;
+  wire [106:0] shifted_mantissa = uut.shifted_mantissa;
+  wire [106:0] rounded_mantissa = uut.rounded_mantissa;
+  wire [106:0] M_1 = uut.M_1;
+  wire [106:0] M_2 = uut.M_2;
+  wire exp_overflow = uut.exp_overflow;
+  wire [11:0] exp_3 = uut.exp_3;
   // Test case structure: A, B, expected_output
   reg [63:0] test_A[0:50];
   reg [63:0] test_B[0:50];
@@ -335,7 +333,7 @@ module FPAdder_tb;
     test_name[48] = "3.14159 + (-2.71828) = 0.42331";
 
     // Test 49: 100.001 + (-100) = 0.001
-    test_A[49] = 64'h4059000A7C5AC472;
+    test_A[49] = 64'h40590010624dd2f2;
     test_B[49] = 64'hC059000000000000;
     expected[49] = 64'h3F50624DD2F1A9FC;
     test_name[49] = "100.001 + (-100) = 0.001";
@@ -360,13 +358,18 @@ module FPAdder_tb;
         $display("Test %2d: FAIL - %s", i, test_name[i]);
         $display("         Expected: %h, Got: %h", expected[i], out);
         $display("debugging....");
-        $display("M_2: 0%b", M_2);
-        $display("M_1: 0%b", M_1);
+        $display("M_5: %b %b", rounded_mantissa[106:53], rounded_mantissa[52:0]);
+        $display("M_4: %b %b", shifted_mantissa[106:53], shifted_mantissa[52:0]);
+        $display("M_3: %b %b", temp_mantissa[106:53], temp_mantissa[52:0]);
+        $display("M_2: %b %b", M_2[106:53], M_2[52:0]);
+        $display("M_1: %b %b", M_1[106:53], M_1[52:0]);
+        /*
         $display("M_3: %b", temp_mantissa);
         $display("M_4: %b", shifted_mantissa);
         $display("Added?: %b", add);
         $display("Shifted G, R, S: %b %b %b", G_1, R_1, S_1);
         $display("ROunded in subtraction? %b", round_sub);
+        */
         failed = failed + 1;
       end
     end

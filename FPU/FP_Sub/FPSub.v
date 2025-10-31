@@ -5,8 +5,8 @@ module FPSub (
     output [63:0] out
 );
   FPAdder FP_subtraction (
-      .A  (A),
-      .B  (B ^ 64'h8000000000000000),
+      .B  (A),
+      .A  (B ^ 64'h8000000000000000),
       .out(out)
   );
 endmodule
