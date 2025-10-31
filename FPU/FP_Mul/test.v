@@ -14,7 +14,14 @@ module FPMul_tb;
       .N2 (N2),
       .out(out)
   );
-
+  wire [127:0] mantissa_product = uut.mantissa_product;
+  wire [63:0] mantissa_normalized = uut.mantissa_normalized;
+  wire [63:0] mantissa_rounded = uut.mantissa_rounded;
+  wire [51:0] mantissa_renormalized = uut.mantissa_renormalized;
+  wire L = uut.L;
+  wire G = uut.G;
+  wire R = uut.R;
+  wire S = uut.S;
   initial begin
     pass_count = 0;
     fail_count = 0;
@@ -589,6 +596,13 @@ module FPMul_tb;
       pass_count = pass_count + 1;
     end else begin
       $display("Test 44: FAIL - 3.0 * (1/3) (Expected: %h, Got: %h)", expected, out);
+      $display("Test 50: FAIL - 0.001 * 0.001 (Expected: %h, Got: %h)", expected, out);
+      $display("Mantissa Product: %b", mantissa_product);
+      $display("Mantissa Normalized: %b", mantissa_normalized);
+      $display("Mantissa Rounded: %b", mantissa_rounded);
+      $display("Mantissa Renomralized: %b", mantissa_renormalized);
+      $display("L G R S %b %b %b %b", L, G, R, S);
+      fail_count = fail_count + 1;
       fail_count = fail_count + 1;
     end
 
@@ -667,6 +681,10 @@ module FPMul_tb;
       pass_count = pass_count + 1;
     end else begin
       $display("Test 50: FAIL - 0.001 * 0.001 (Expected: %h, Got: %h)", expected, out);
+      $display("Mantissa Product: %b", mantissa_product);
+      $display("Mantissa Normalized: %b", mantissa_normalized);
+      $display("Mantissa Rounded: %b", mantissa_rounded);
+      $display("Mantissa Renomralized: %b", mantissa_renormalized);
       fail_count = fail_count + 1;
     end
 

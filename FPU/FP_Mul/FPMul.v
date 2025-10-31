@@ -30,7 +30,7 @@ module FPMul (
   wire [63:0] exponent_2 = exponent_1 - 64'd1023;
 
   // Multiplying mantissas M_1 and M_2
-  wire [127:0] mantissa_product = {64'b0, 11'b0, |E_1, M_1} * {64'b0, 11'b0, |E_2, M_2};
+  wire [127:0] mantissa_product = {64'b0, 11'b0, 1'b1, M_1} * {64'b0, 11'b0, 1'b1, M_2};
 
   // Normalizing mantissa (LSB, Guard, Round, Sticky)
   // Round to nearest even has been followed
@@ -46,11 +46,12 @@ module FPMul (
 
   // To add up or not to reach nearest even
 
-  //wire round = (G & (R | S)) | (L & G & (~R) & (~S));
-  wire round = G & (L | R | S);
+  //wire round = (G & (R | S)) | (L& G & (~R) & (~S));
+  //wire round = G & (L | R | S);
+  wire round = (G & (R | S));
 
 
-  wire [64:0] mantissa_rounded_cout = {12'b0, mantissa_normalized} + (round ? 65'b1 : 65'b0);
+  wire [64:0] mantissa_rounded_cout = {12'b0, mantissa_normalized} + (round ? 65'd1 : 65'd0);
 
   // Renormalizing
   wire [63:0] mantissa_rounded = mantissa_rounded_cout[63:0];
