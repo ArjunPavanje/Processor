@@ -17,7 +17,9 @@ Instructions supported:
 */
 module fpu_cntrl (
     input [31:0] instruction,
-    output reg [4:0] fpu_op
+    output reg [4:0] fpu_op,
+    output reg fpu_rs1,
+    output reg fpu_rd
 );
   wire [ 4:0] funct5 = instruction[31:27];
   wire [ 1:0] fmt = instruction[26:25];
@@ -36,6 +38,56 @@ module fpu_cntrl (
       14'b11100011010011: fpu_op = 5'b00111;  // fmv.x.d
       14'b11110011010011: fpu_op = 5'b01000;  // fmv.d.x
       default: fpu_op = 5'b11111;
+    endcase
+  end
+  always @(*) begin
+    case (fpu_op)
+      5'b00000: begin
+        out = sum;
+        fpu_rd = 1;
+        fpu_rs1 = 1;
+      end
+      5'b00001: begin
+        out = difference;
+        fpu_rd = 1;
+        fpu_rs1 = 1;
+      end
+      5'b00010: begin
+        out = product;
+        fpu_rs1 = 1;
+        fpu_rd = 1;
+      end
+      5'b00011: begin
+        out = quotient;
+        fpu_rd = 1;
+        fpu_rs1 = 1;
+      end
+      5'b00100: begin
+        out = sqrt;
+        fpu_rd = 1;
+        fpu_rs1 = 1;
+      end
+      5'b00101: begin
+        out = fcvt_ld;
+        fpu_rd = 0;
+        fpu_rs1 = 1;
+      end
+      5'b00110: begin
+        out = fcvt_dl;
+        fpu_rd = 1;
+        fpu_rs1 = 0;
+      end
+      5'b00111: begin
+        // fmv.x.d
+        out = in1;
+        fpu_rd = 0;
+        fpu_rs1 = 1;
+      end
+      5'b01000: begin
+        out = in1;
+        fpu_rd = 1;
+        fpu_rs1 = 0;
+      end
     endcase
   end
 endmodule
