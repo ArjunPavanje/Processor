@@ -2,7 +2,6 @@ module hdu (
     // input  [128:0] ID_EX,
     // input  [128:0] EX_MEM,
     // input  [128:0] MEM_WB,
-
     input reg_write_EX_MEM,
     input reg_write_MEM_WB,
     input rs1_ID_EX,
@@ -10,9 +9,12 @@ module hdu (
     input [5:0] rs2_ID_EX,
     input [5:0] rsd_EX_MEM,
     input [5:0] rsd_MEM_WB,
+    input [31:0] instr_IF_ID,
+    input [31:0] instr_ID_EX,
 
     output [1:0] forward_A,
-    output [1:0] forward_B
+    output [1:0] forward_B,
+    output jump
 );
   // Temproary, will change
   // wire [31:0] instr_ID_EX = ID_EX[31:0];
@@ -23,6 +25,7 @@ module hdu (
   // wire [4:0] rsd_MEM_WB = MEM_WB[11:7];
   // wire [4:0] rs1_ID_EX = ID_EX[19:15];
   // wire [4:0] rs2_ID_EX = ID_EX[24:20];
+
 
   // Checking write enabled
   wire write_enabled_EX_MEM = reg_write_EX_MEM;
@@ -69,6 +72,26 @@ module hdu (
   // 01 -> from MEM/WB
   // 00 -> Neither
   assign forward_B = (from_EX_MEM_B) ? (2'b10) : ((from_MEM_WB_B) ? (2'b01) : 2'd0);
+
+
+  // Analyzing instruction
+  wire [6:0] opcode_ID_EX = instr_ID_EX[6:0];
+  wire [4:0] rd = instr_ID_EX[11:7];
+  wire is_riuj = (opcode_ID_EX == 7'b0110011 | opcode_ID_EX == 7'b0010011 | opcode_ID_EX == 7'b0110111 | opcode_ID_EX == 7'b1101111 | opcode_ID_EX== 7'b1100111 | opcode_ID_EX == 7'b1110011);  // R, I, U, J type
+
+  //~(opcode_ID_EX == 7'b0100011 | opcode_ID_EX == 7'b1100011);  // Not S or B type
+  //(opcode_ID_EX == 7'b0110011 | opcode_ID_EX == 7'b0010011 | opcode_ID_EX == 7'b0110111 | opcode_ID_EX == 7'b1101111 | opcode_ID_EX== 7'b1100111 | opcode_ID_EX == 7'b1110011);  // R, I, U, J type
+
+  wire [6:0] opcode_IF_ID = instr_IF_ID[6:0];
+  wire [2:0] funct3 = instr_IF_ID[14:12];
+  wire [4:0] rs1 = instr_IF_ID[19:15];
+
+  wire is_jalr = (opcode_IF_ID == 7'b1100111 & funct3 == 3'b000) ? (1'b1) : (1'b0);
+
+  wire reg_eq = rs1 == rd;
+
+  assign jump = (is_jalr & is_riuj & reg_eq);
+  // assign jump = (is_jalr & reg_eq_jalr) | (is_jal & reg_eq_jal);
 
 
   // wire [1:0] forward_A_EX_MEM = (reg_write_EX_MEM)?((rsd_EX_MEM != 5'd0):((rsd_EX_MEM == rs1_ID_EX)?2'b10:2'd0):2'd0):2'd0;
