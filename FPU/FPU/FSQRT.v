@@ -1,23 +1,39 @@
-module FSQRT (
-    input  [63:0] in,
-    output [63:0] out
+
+module FSQRT #(
+    parameter BUS_WIDTH = 64
+) (
+    input  [BUS_WIDTH-1:0] in1,
+    output [BUS_WIDTH-1:0] out
 );
-  wire [63:0] y_1;
-  wire [63:0] quotient;
-  FPDiv FSQRT_div (
-      .in1(64'h3ff0000000000000),
-      .in2(in),
+  // Main parameters
+  localparam MANTISSA_SIZE = (BUS_WIDTH == 64) ? 52 : 23;
+  localparam EXPONENT_SIZE = (BUS_WIDTH == 64) ? 11 : 8;
+  localparam BIAS = (BUS_WIDTH == 64) ? 1023 : 127;
+
+  localparam ONE = (BUS_WIDTH == 64) ? 64'h3ff0000000000000 : 32'h3f800000;
+  localparam NAN = (BUS_WIDTH == 64) ? 64'h7ff8000000000000 : 32'h7fc00000;
+  localparam INFINITY_P = (BUS_WIDTH == 64) ? 64'h7ff0000000000000 : 32'h7f800000;
+  localparam INFINITY_N = (BUS_WIDTH == 64) ? 64'hfff0000000000000 : 32'hff800000;
+  localparam ZERO = (BUS_WIDTH == 64) ? 64'd0 : 32'd0;
+
+  wire [BUS_WIDTH-1:0] y_1;
+  wire [BUS_WIDTH-1:0] quotient;
+  FPDiv #(
+      .BUS_WIDTH(BUS_WIDTH)
+  ) FSQRT_div (
+      .N1 (ONE),
+      .N2 (in1),
       .out(quotient)
   );
   quake3 FSQRT_quake (
       .x(quotient),
       .y(y_1)
   );
-  wire is_underflow = (y_1[62:52] == 11'b0) & (|y_1[51:0]);
-  wire is_inf = (in == 64'h7ff0000000000000);
-  wire is_zero = ~(|in[62:0]) | is_underflow;
-  wire is_neg = in[63];
+  wire is_underflow = ~(|y_1[BUS_WIDTH-2:MANTISSA_SIZE]) & (|y_1[MANTISSA_SIZE-1:0]);
+  wire is_inf = (in1 == INFINITY_P);
+  wire is_zero = ~(|x[BUS_WIDTH-2:0]) | is_underflow;
+  wire is_neg = in1[BUS_WIDTH-1];
 
-  assign out = (is_neg)?(64'h7ff8000000000000):(is_zero?(64'b0):(is_inf?(64'h7ff0000000000000):(y_1)));
+  assign out = (is_neg) ? (NAN) : (is_zero ? (ZERO) : (is_inf ? (INFINITY_P) : (y_1)));
 
 endmodule

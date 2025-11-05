@@ -9,6 +9,11 @@ Instructions supported:
 7. fcvt.d.l (long to double) (00110)
 8. fmv.x.d (double to long) (00111)
 9. fmv.d.x (long to double) (01000)
+10. fadd.s (01001)
+11. fsub.s (01010)
+12. fmul.s (01011)
+13. fdiv.s (01100)
+14. fsqrt.s (01101)
 */
 /*
 * Flags to be added
@@ -26,68 +31,164 @@ module fpu_cntrl (
   wire [ 6:0] opcode = instruction[6:0];
 
   wire [13:0] diff = {funct5, fmt, opcode};
+
   always @(*) begin
     case (diff)
-      14'b00000011010011: fpu_op = 5'b00000;
-      14'b00001011010011: fpu_op = 5'b00001;
-      14'b00010011010011: fpu_op = 5'b00010;
-      14'b00011011010011: fpu_op = 5'b00011;
-      14'b01011011010011: fpu_op = 5'b00100;
-      14'b11000011010011: fpu_op = 5'b00101;
-      14'b11010011010011: fpu_op = 5'b00110;
-      14'b11100011010011: fpu_op = 5'b00111;  // fmv.x.d
-      14'b11110011010011: fpu_op = 5'b01000;  // fmv.d.x
-      default: fpu_op = 5'b11111;
-    endcase
-  end
-  always @(*) begin
-    case (fpu_op)
-      5'b00000: begin
-        out = sum;
-        fpu_rd = 1;
+      14'b00000011010011: begin
+        fpu_op  = 5'b00000;
+        fpu_rd  = 1;
         fpu_rs1 = 1;
       end
-      5'b00001: begin
-        out = difference;
-        fpu_rd = 1;
+      14'b00001011010011: begin
+        fpu_op  = 5'b00001;
+        fpu_rd  = 1;
         fpu_rs1 = 1;
       end
-      5'b00010: begin
-        out = product;
-        fpu_rs1 = 1;
-        fpu_rd = 1;
-      end
-      5'b00011: begin
-        out = quotient;
-        fpu_rd = 1;
+      14'b00010011010011: begin
+        fpu_op  = 5'b00010;
+        fpu_rd  = 1;
         fpu_rs1 = 1;
       end
-      5'b00100: begin
-        out = sqrt;
-        fpu_rd = 1;
+      14'b00011011010011: begin
+        fpu_op  = 5'b00011;
+        fpu_rd  = 1;
         fpu_rs1 = 1;
       end
-      5'b00101: begin
-        out = fcvt_ld;
-        fpu_rd = 0;
+      14'b01011011010011: begin
+        fpu_op  = 5'b00100;
+        fpu_rd  = 1;
         fpu_rs1 = 1;
       end
-      5'b00110: begin
-        out = fcvt_dl;
-        fpu_rd = 1;
+      14'b11000011010011: begin
+        fpu_op  = 5'b00101;
+        fpu_rd  = 0;
+        fpu_rs1 = 1;
+      end
+      14'b11010011010011: begin
+        fpu_op  = 5'b00110;
+        fpu_rd  = 1;
         fpu_rs1 = 0;
       end
-      5'b00111: begin
-        // fmv.x.d
-        out = in1;
-        fpu_rd = 0;
+      14'b11100011010011: begin
+        fpu_op  = 5'b00111;
+        fpu_rd  = 0;
         fpu_rs1 = 1;
-      end
-      5'b01000: begin
-        out = in1;
-        fpu_rd = 1;
+      end  // fmv.x.d
+      14'b11110011010011: begin
+        fpu_op  = 5'b01000;
+        fpu_rd  = 1;
+        fpu_rs1 = 0;
+      end  // fmv.d.x
+      14'b00000001010011: begin
+        fpu_op  = 5'b01001;
+        fpu_rd  = 1;
+        fpu_rs1 = 1;
+      end  // fadd.s
+      14'b00001001010011: begin
+        fpu_op  = 5'b01010;
+        fpu_rd  = 1;
+        fpu_rs1 = 1;
+      end  // fsub.s
+      14'b00010001010011: begin
+        fpu_op  = 5'b01011;
+        fpu_rd  = 1;
+        fpu_rs1 = 1;
+      end  // fmul.s
+      14'b00011001010011: begin
+        fpu_op  = 5'b01100;
+        fpu_rd  = 1;
+        fpu_rs1 = 1;
+      end  // fdiv.s
+      14'b01011001010011: begin
+        fpu_op  = 5'b01101;
+        fpu_rd  = 1;
+        fpu_rs1 = 1;
+      end  // fsqrt.s
+      default: begin
+        fpu_op  = 5'b11111;
+        fpu_rd  = 0;
         fpu_rs1 = 0;
       end
     endcase
   end
+  // always @(*) begin
+  //   case (diff)
+  //     14'b00000011010011: fpu_op = 5'b00000;
+  //     14'b00001011010011: fpu_op = 5'b00001;
+  //     14'b00010011010011: fpu_op = 5'b00010;
+  //     14'b00011011010011: fpu_op = 5'b00011;
+  //     14'b01011011010011: fpu_op = 5'b00100;
+  //     14'b11000011010011: fpu_op = 5'b00101;
+  //     14'b11010011010011: fpu_op = 5'b00110;
+  //     14'b11100011010011: fpu_op = 5'b00111;  // fmv.x.d
+  //     14'b11110011010011: fpu_op = 5'b01000;  // fmv.d.x
+  //     14'b00000001010011: fpu_op = 5'b01001;  //fadd.s
+  //     14'b00001001010011: fpu_op = 5'b01010;  //fsub.s
+  //     14'b00010001010011: fpu_op = 5'b01011;  //fmul.s
+  //     14'b00011001010011: fpu_op = 5'b01100;  //fdiv.s
+  //     14'b01011001010011: fpu_op = 5'b01101;  //fsqrt.s
+  //     default: fpu_op = 5'b11111;
+  //   endcase
+  // end
+  // always @(*) begin
+  //   case (fpu_op)
+  //     5'b00000: begin
+  //       fpu_rd  = 1;
+  //       fpu_rs1 = 1;
+  //     end
+  //     5'b00001: begin
+  //       fpu_rd  = 1;
+  //       fpu_rs1 = 1;
+  //     end
+  //     5'b00010: begin
+  //       fpu_rs1 = 1;
+  //       fpu_rd  = 1;
+  //     end
+  //     5'b00011: begin
+  //       fpu_rd  = 1;
+  //       fpu_rs1 = 1;
+  //     end
+  //     5'b00100: begin
+  //       fpu_rd  = 1;
+  //       fpu_rs1 = 1;
+  //     end
+  //     5'b00101: begin
+  //       fpu_rd  = 0;
+  //       fpu_rs1 = 1;
+  //     end
+  //     5'b00110: begin
+  //       fpu_rd  = 1;
+  //       fpu_rs1 = 0;
+  //     end
+  //     5'b00111: begin
+  //       // fmv.x.d
+  //       fpu_rd  = 0;
+  //       fpu_rs1 = 1;
+  //     end
+  //     5'b01000: begin
+  //       fpu_rd  = 1;
+  //       fpu_rs1 = 0;
+  //     end
+  //     5'b01001: begin  //fadd.s
+  //       fpu_rd  = 1;
+  //       fpu_rs1 = 1;
+  //     end
+  //     5'b01010: begin  //fsub.s
+  //       fpu_rd  = 1;
+  //       fpu_rs1 = 1;
+  //     end
+  //     5'b01011: begin  //fmul.s
+  //       fpu_rs1 = 1;
+  //       fpu_rd  = 1;
+  //     end
+  //     5'b01100: begin  //fdiv.s
+  //       fpu_rd  = 1;
+  //       fpu_rs1 = 1;
+  //     end
+  //     5'b01101: begin  //fsqrt.s
+  //       fpu_rd  = 1;
+  //       fpu_rs1 = 1;
+  //     end
+  //   endcase
+  // end
 endmodule
