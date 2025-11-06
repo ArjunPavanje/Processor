@@ -21,17 +21,19 @@ module FSQRT #(
   FPDiv #(
       .BUS_WIDTH(BUS_WIDTH)
   ) FSQRT_div (
-      .N1 (ONE),
-      .N2 (in1),
+      .in1(ONE),
+      .in2(in1),
       .out(quotient)
   );
-  quake3 FSQRT_quake (
+  quake3 #(
+      .BUS_WIDTH(BUS_WIDTH)
+  ) FSQRT_quake (
       .x(quotient),
       .y(y_1)
   );
   wire is_underflow = ~(|y_1[BUS_WIDTH-2:MANTISSA_SIZE]) & (|y_1[MANTISSA_SIZE-1:0]);
   wire is_inf = (in1 == INFINITY_P);
-  wire is_zero = ~(|x[BUS_WIDTH-2:0]) | is_underflow;
+  wire is_zero = ~(|in1[BUS_WIDTH-2:0]) | is_underflow;
   wire is_neg = in1[BUS_WIDTH-1];
 
   assign out = (is_neg) ? (NAN) : (is_zero ? (ZERO) : (is_inf ? (INFINITY_P) : (y_1)));

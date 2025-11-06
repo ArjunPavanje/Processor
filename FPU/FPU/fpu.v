@@ -54,22 +54,22 @@ module FPU #(
       .in2(in2),
       .out(quotient_d)
   );
-  Fsqrt_d #(
+  FSQRT #(
       .BUS_WIDTH(BUS_WIDTH)
-  ) fp_sqrt_d_d (
-      .in (in1),
+  ) fp_sqrt_d (
+      .in1(in1),
       .out(sqrt_d)
   );
   FCVT_int #(
-      .BUS_WIDTH(64)
+      .BUS_WIDTH(BUS_WIDTH)
   ) fp_ld (
-      .in (in1),
+      .in1(in1),
       .out(fcvt_ld)
   );
   FCVT_fp #(
-      .BUS_WIDTH(64)
+      .BUS_WIDTH(BUS_WIDTH)
   ) fp_dl (
-      .in (in1),
+      .in1(in1),
       .out(fcvt_dl)
   );
   FPAdder #(
@@ -100,10 +100,10 @@ module FPU #(
       .in2(in2),
       .out(quotient_s)
   );
-  Fsqrt_d #(
+  FSQRT #(
       .BUS_WIDTH(32)
-  ) fp_sqrt_d_s (
-      .in (in1),
+  ) fp_sqrt_s (
+      .in1(in1),
       .out(sqrt_s)
   );
 
@@ -156,19 +156,19 @@ module FPU #(
         // fpu_rs1 = 0;
       end
       5'b01001: begin
-        out = {32'd0, sum_s};
+        out = sum_s;
       end
       5'b01010: begin
-        out = {32'd0, difference_s};
+        out = difference_s;
       end
       5'b01011: begin
-        out = {32'd0, product_s};
+        out = product_s;
       end
       5'b01100: begin
-        out = {32'd0, quotient_s};
+        out = quotient_s;
       end
       5'b01101: begin
-        out = {32'd0, sqrt_s};
+        out = sqrt_s;
       end
     endcase
   end

@@ -34,7 +34,7 @@ module FPDiv #(
   localparam ROUND_DOWN = (BUS_WIDTH == 64) ? 64'd0 : 32'd0;
   localparam EXPONENT_INC = (BUS_WIDTH == 64) ? 12'd1 : 9'd1;
   localparam EXPONENT_NO_CHANGE = (BUS_WIDTH == 64) ? 12'd0 : 9'd0;
-  localparam IS_INFINITY = (BUS_WIDTH == 64) ? 11'h7FF : 8'h7F;
+  localparam IS_INFINITY = (BUS_WIDTH == 64) ? 11'h7FF : 8'hFF;
   localparam NAN = (BUS_WIDTH == 64) ? 64'h7ff8000000000000 : 32'h7fc00000;
   localparam INFINITY_P = (BUS_WIDTH == 64) ? 64'h7ff0000000000000 : 32'h7f800000;
   localparam INFINITY_N = (BUS_WIDTH == 64) ? 64'hfff0000000000000 : 32'hff800000;
@@ -112,7 +112,7 @@ module FPDiv #(
 
 
   //wire is_inf = ~is_NaN & ((is_inf_1 | (|M_2)) | exp_overflow);
-  wire is_inf = ~is_NaN & (is_inf_1 | ~(|N2[BUS_WIDTH-2:0]) | exp_overflow);
+  wire is_inf = ~is_NaN & (is_inf_1 | ~(|in2[BUS_WIDTH-2:0]) | exp_overflow);
 
 
   //(is_inf_1 & |E_2) | (is_inf_2 & |E_1);  // 0 * infinity
@@ -121,7 +121,7 @@ module FPDiv #(
   //wire is_zero = ~is_NaN & (is_inf_2 | (|M_1) | exp_underflow);
 
   //wire is_zero = ~is_NaN & (~(|N1[62:0]) | exp_underflow);
-  wire is_zero = ~is_NaN & (~(|N1[BUS_WIDTH-2:0]) & (|N2[BUS_WIDTH-2:0]));
+  wire is_zero = ~is_NaN & (~(|in1[BUS_WIDTH-2:0]) & (|in2[BUS_WIDTH-2:0]));
   //(~(|E_1)) | (~(|E_2)) | exp_underflow;
 
 

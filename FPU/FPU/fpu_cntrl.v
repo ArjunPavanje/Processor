@@ -14,6 +14,24 @@ Instructions supported:
 12. fmul.s (01011)
 13. fdiv.s (01100)
 14. fsqrt.s (01101)
+15. fmin.s (01110)
+16. fmax.s (01111)
+17. fmin.d (10000)
+18. fmax.d (10001)
+19. feq.s (10010)
+20. flt.s (10011)
+21. fge.s (10100)
+22. feq.d (10101)
+23. flt.d (10110)
+24. fge.d (10111)
+
+25. fsgnj.s (11000)
+26. fsgnjn.s (11001)
+27. fsgnjx.s (11010)
+28. fsgnj.d (11011)
+29. fsgnjn.d (11100)
+30. fsgnjx.d (11101)
+
 */
 /*
 * Flags to be added

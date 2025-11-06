@@ -20,7 +20,7 @@ module FPMul #(
   localparam EXPONENT_INC = (BUS_WIDTH == 64) ? 12'd1 : 9'd1;
   localparam EXPONENT_NO_CHANGE = (BUS_WIDTH == 64) ? 12'd0 : 9'd0;
   localparam PAD_2 = (BUS_WIDTH == 64) ? 12'd0 : 9'd0;
-  localparam IS_INFINITY = (BUS_WIDTH == 64) ? 11'h7FF : 8'h7F;
+  localparam IS_INFINITY = (BUS_WIDTH == 64) ? 11'h7FF : 8'hFF;
   localparam NAN = (BUS_WIDTH == 64) ? 64'h7ff8000000000000 : 32'h7fc00000;
   localparam INFINITY_P = (BUS_WIDTH == 64) ? 64'h7ff0000000000000 : 32'h7f800000;
   localparam INFINITY_N = (BUS_WIDTH == 64) ? 64'hfff0000000000000 : 32'hff800000;
@@ -37,7 +37,7 @@ module FPMul #(
   assign M_2 = in2[MANTISSA_SIZE-1:0];
 
   assign E_1 = in1[BUS_WIDTH-2:MANTISSA_SIZE];
-  assign E_2 = N2[BUS_WIDTH-2:MANTISSA_SIZE];
+  assign E_2 = in2[BUS_WIDTH-2:MANTISSA_SIZE];
 
   assign S_1 = in1[BUS_WIDTH-1];
   assign S_2 = in2[BUS_WIDTH-1];
@@ -95,6 +95,7 @@ module FPMul #(
 
   wire is_inf = ((is_inf_1 | is_inf_2) & !is_NaN) | exp_overflow;
   wire is_NaN = (is_inf_1 & |E_2) | (is_inf_2 & |E_1);  // 0 * infinity
+
   // Checking for multiplication by 0
   wire is_zero = (~(|E_1)) | (~(|E_2)) | exp_underflow;
 

@@ -1,5 +1,3 @@
-`include "/Users/arjunpavanje/Documents/Github/Processor/FPU/FSQRT/newton_ralphson.v"
-
 module quake3 #(
     parameter BUS_WIDTH = 64
 ) (
