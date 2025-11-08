@@ -1,6 +1,6 @@
 module fpu_cntrl_tb;
   reg  [31:0] instruction;
-  wire [ 4:0] fpu_op;
+  wire [ 5:0] fpu_op;
   wire [31:0] out;
   // wire [31:0] in1 = 32'h3f800000;  //1.0
   wire [31:0] in1 = 32'h41bd999a;  //23.7
@@ -69,6 +69,7 @@ module fpu_cntrl_tb;
     #10;
     $display("unknown op = %b (expected: 111)", fpu_op);
     */
+    $display("FPU MORE OPs ADDED");
     $finish;
   end
 endmodule
