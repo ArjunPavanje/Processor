@@ -1,10 +1,12 @@
 module fpu_cntrl_tb;
   reg  [31:0] instruction;
   wire [ 5:0] fpu_op;
-  wire [31:0] out;
+  wire [63:0] out;
   // wire [31:0] in1 = 32'h3f800000;  //1.0
-  wire [31:0] in1 = 32'h41bd999a;  //23.7
-  wire [31:0] in2 = 32'h4134cccd;  //11.3
+  wire [63:0] in1 = 64'h4048800000000000;  // 49
+  //32'h41bd999a;  //23.7
+  wire [63:0] in2 = 64'h402a000000000000;  // 13
+  //32'h4134cccd;  //11.3
 
 
   // Instantiate DUT
@@ -13,7 +15,7 @@ module fpu_cntrl_tb;
       .fpu_op(fpu_op)
   );
   FPU #(
-      .BUS_WIDTH(32)
+      .BUS_WIDTH(64)
   ) uut (
       .in1(in1),
       .in2(in2),
@@ -22,11 +24,11 @@ module fpu_cntrl_tb;
   );
   initial begin
     // Test fadd.s f1, f2, f3;
-    instruction = 32'h003170d3;  // funct5[31:27], fmt[26:25], x [24:7], opcode[6:0]
+    instruction = 32'h0a20f253;  // funct5[31:27], fmt[26:25], x [24:7], opcode[6:0]
     #10;
     $display("fadd.s op = %b (expected: 000)", fpu_op);
     $display("fadd.s f1, f2, f3 output = %h", out);
-
+    /*
     // Test fsub.s f11, f20, f13;
     instruction = 32'h08da75d3;
     #10;
@@ -50,7 +52,7 @@ module fpu_cntrl_tb;
     #10;
     $display("fsqrt.s op = %b (expected: 100)", fpu_op);
     $display("fsqrt.s output = %h", out);
-
+  */
     // // Test fcvt.l.d x19, f11;
     // instruction = 32'hc225f9d3;
     // #10;

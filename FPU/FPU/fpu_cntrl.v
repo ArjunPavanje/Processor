@@ -38,6 +38,15 @@
 27. fmv.x.d    6'b100000
 28. fmv.d.x    6'b100001
 
+* CVT
+
+29. fcvt.l.d 6'b100010
+30. fcvt.d.l 6'b100011
+31. fcvt.s.d 6'b100100
+32. fcvt.d.s 6'b100101
+33. fcvt.s.w   6'b100110
+34. fcvt.w.s   6'b100111
+
 */
 /*
 * Flags to be added
@@ -261,9 +270,57 @@ module fpu_cntrl #(
         fpu_rs1 = 1;
       end
       {  // fmv.d.x
-        5'b11110, 2'b00, 3'b000, 7'b1010011
+        5'b11110, 2'b01, 3'b000, 7'b1010011
       } : begin
         fpu_op  = 6'b100001;
+        fpu_rd  = 1;
+        fpu_rs1 = 0;
+      end
+      {  // fcvt.l.d
+        5'b11000, 2'b01, 3'bzzz, 7'b1010011
+      } : begin
+        fpu_op  = 6'b100010;
+        fpu_rd  = 0;
+        fpu_rs1 = 1;
+      end
+      {  // fcvt.d.l
+        5'b11010, 2'b01, 3'bzzz, 7'b1010011
+      } : begin
+        fpu_op  = 6'b100010;
+        fpu_rd  = 1;
+        fpu_rs1 = 0;
+      end
+
+      {  // fcvt.w.s
+        5'b11000, 2'b00, 3'bzzz, 7'b1010011
+      } : begin
+        fpu_op  = 6'b100110;
+        fpu_rd  = 0;
+        fpu_rs1 = 1;
+      end
+      {  // fcvt.s.w
+        5'b11010, 2'b00, 3'bzzz, 7'b1010011
+      } : begin
+        fpu_op  = 6'b100111;
+        fpu_rd  = 1;
+        fpu_rs1 = 0;
+      end
+      {  // fcvt.s.d
+        5'b01000, 2'b00, 3'bzzz, 7'b1010011
+      } : begin
+        fpu_op  = 6'b100100;
+        fpu_rd  = 1;
+        fpu_rs1 = 1;
+      end
+      {  // fcvt.d.s
+        5'b01000, 2'b01, 3'bzzz, 7'b1010011
+      } : begin
+        fpu_op  = 6'b100101;
+        fpu_rd  = 1;
+        fpu_rs1 = 1;
+      end
+      default: begin
+        fpu_op  = 6'b111111;
         fpu_rd  = 1;
         fpu_rs1 = 1;
       end

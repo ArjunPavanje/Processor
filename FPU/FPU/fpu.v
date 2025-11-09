@@ -12,14 +12,14 @@ module FPU #(
     output reg [BUS_WIDTH-1:0] out
 );
   localparam PAD_ZERO = 32'd0;
+  localparam ZERO_32 = 32'd0;
+  localparam DEFAULT = (BUS_WIDTH == 64) ? 64'h7ff8000000000000 : 32'h7fc80000;
 
   wire [BUS_WIDTH-1:0] sum_d;
   wire [BUS_WIDTH-1:0] difference_d;
   wire [BUS_WIDTH-1:0] product_d;
   wire [BUS_WIDTH-1:0] quotient_d;
   wire [BUS_WIDTH-1:0] sqrt_d;
-  wire [BUS_WIDTH-1:0] fcvt_ld;
-  wire [BUS_WIDTH-1:0] fcvt_dl;
 
   wire [BUS_WIDTH-1:0] fpmin_d;
   wire [BUS_WIDTH-1:0] fpmax_d;
@@ -29,6 +29,10 @@ module FPU #(
   wire [BUS_WIDTH-1:0] fsgnj_d;
   wire [BUS_WIDTH-1:0] fsgnjn_d;
   wire [BUS_WIDTH-1:0] fsgnjx_d;
+  wire [BUS_WIDTH-1:0] fcvt_l_d;
+  wire [BUS_WIDTH-1:0] fcvt_d_l;
+  wire [31:0] fcvt_s_d;
+  wire [63:0] fcvt_d_s;
 
   wire [31:0] sum_s;
   wire [31:0] difference_s;
@@ -44,6 +48,8 @@ module FPU #(
   wire [31:0] fsgnj_s;
   wire [31:0] fsgnjn_s;
   wire [31:0] fsgnjx_s;
+  wire [31:0] fcvt_w_s;
+  wire [31:0] fcvt_s_w;
 
   FPAdder #(
       .BUS_WIDTH(BUS_WIDTH)
@@ -212,7 +218,7 @@ module FPU #(
       .in2(in2),
       .out(fsgnj_d)
   );
-  FSGNJ #(
+  FSGNJN #(
       .BUS_WIDTH(BUS_WIDTH)
   ) f_sgnjn_d (
       .in1(in1),
@@ -234,7 +240,7 @@ module FPU #(
       .in2(in2),
       .out(fsgnj_s)
   );
-  FSGNJ #(
+  FSGNJN #(
       .BUS_WIDTH(32)
   ) f_sgnjn_s (
       .in1(in1),
@@ -248,6 +254,45 @@ module FPU #(
       .in2(in2),
       .out(fsgnjx_s)
   );
+
+  // FCVT
+  FCVT_int #(
+      .BUS_WIDTH(BUS_WIDTH)
+  ) fcvt_ld (
+      .in1(in1),
+      .out(fcvt_l_d)
+  );
+  FCVT_fp #(
+      .BUS_WIDTH(BUS_WIDTH)
+  ) fcvt_dl (
+      .in1(in1),
+      .out(fcvt_d_l)
+  );
+  FCVT_int #(
+      .BUS_WIDTH(32)
+  ) fcvt_ws (
+      .in1(in1),
+      .out(fcvt_w_s)
+  );
+  FCVT_fp #(
+      .BUS_WIDTH(32)
+  ) fcvt_sw (
+      .in1(in1),
+      .out(fcvt_s_w)
+  );
+  FCVT_int #(
+      .BUS_WIDTH(64)
+  ) fcvt_sd (
+      .in1(in1),
+      .out(fcvt_s_d)
+  );
+  FCVT_fp #(
+      .BUS_WIDTH(64)
+  ) fcvt_ds (
+      .in1(in1),
+      .out(fcvt_d_s)
+  );
+
   always @(*) begin
     case (fpu_op)
 
@@ -345,8 +390,27 @@ module FPU #(
         out = in1;
       end
 
+      // fcvt operations
+      6'b100010: begin
+        out = (BUS_WIDTH == 64) ? fcvt_l_d : ZERO_32;
+      end
+      6'b100011: begin
+        out = (BUS_WIDTH == 64) ? fcvt_d_l : ZERO_32;
+      end
+      6'b100100: begin
+        out = (BUS_WIDTH == 64) ? {PAD_ZERO, fcvt_s_d} : ZERO_32;
+      end
+      6'b100101: begin
+        out = (BUS_WIDTH == 64) ? fcvt_d_s : ZERO_32;
+      end
+      6'b100110: begin
+        out = (BUS_WIDTH == 64) ? {PAD_ZERO, fcvt_w_s} : fcvt_w_s;
+      end
+      6'b100111: begin
+        out = (BUS_WIDTH == 64) ? {PAD_ZERO, fcvt_s_w} : fcvt_s_w;
+      end
       default: begin
-        out = 64'b0;
+        out = DEFAULT;
       end
     endcase
   end
