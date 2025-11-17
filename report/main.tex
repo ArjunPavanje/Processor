@@ -1,0 +1,1991 @@
+\documentclass[12pt,a4paper, oneside]{book}
+% Packages for enhanced functionality
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx} % For including images
+\usepackage{geometry} % For page layout
+\usepackage{hyperref} % For clickable links and references
+\usepackage{fancyhdr} % For custom headers and footers
+\usepackage{float} 
+\usepackage{circuitikz}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usepackage{circuitikz}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+\newcommand{\vecb}[1]{\mathbf{#1}}
+\newcommand{\brak}[1]{\ensuremath{\left(#1\right)}}
+\newcommand{\cbrak}[1]{\ensuremath{\left\{#1\right\}}}
+\newcommand{\abs}[1]{\left\vert#1\right\vert}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\providecommand{\sbrak}[1]{\ensuremath{{}\left[#1\right]}}
+\providecommand{\lsbrak}[1]{\ensuremath{{}\left[#1\right.}}
+\providecommand{\rsbrak}[1]{\ensuremath{{}\left.#1\right]}}
+\providecommand{\brak}[1]{\ensuremath{\left(#1\right)}}
+\providecommand{\lbrak}[1]{\ensuremath{\left(#1\right.}}
+\providecommand{\rbrak}[1]{\ensuremath{\left.#1\right)}}
+\providecommand{\cbrak}[1]{\ensuremath{\left\{#1\right\}}}
+\providecommand{\lcbrak}[1]{\ensuremath{\left\{#1\right.}}
+\providecommand{\rcbrak}[1]{\ensuremath{\left.#1\right\}}}
+\hypersetup{
+    colorlinks=true,  % Enable colored text links
+    linkcolor=orange,    % Internal links (sections, table of contents, etc.)
+    urlcolor=orange,     % External URLs
+    citecolor=orange,    % Citations
+    pdfborder={0 0 0} % Remove ugly default borders
+}
+
+
+%\title{\textbf{Processor}}
+%\author{EE24BTECH11002 : Agamjot Singh
+%\\EE24BTECH11005 : Arjun Pavanje
+%\\EE24BTECH11024 : Abhimanyu Koushik}
+
+\begin{document}
+\begin{titlepage}
+    \centering
+    {\LARGE \textbf{Processor}\par}
+    \vspace{1cm}
+    {\large
+    EE24BTECH11002 : Agamjot Singh\\
+    EE24BTECH11005 : Arjun Pavanje\\
+    EE24BTECH11024 : Abhimanyu Koushik\par}
+    \vspace{2cm}
+    \includegraphics[width=0.900pt]{logo.png}\par
+    \vspace{1cm}
+    Bachelor of Technology\\
+    Department of Electrical Engineering\\
+    \vfill
+\end{titlepage}
+\tableofcontents
+\part{Datapath}
+\chapter{Arithmetic and Logic Unit}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/figs_abhimanyu/ALU.png}
+    \caption{ALU Block}
+    \label{fig:alu}
+\end{figure}
+
+\begin{itemize}
+    \item The ALU takes input values from its input ports and performs the specific operation indicated by the \texttt{ALUOp} control signal.
+    \item All arithmetic and logical operations defined in the RISC-V instruction set are implemented within the ALU.
+    \item Each operation is directly implemented in Verilog using appropriate arithmetic and logical operators, ensuring functional accuracy.
+    \item The outputs of all possible operations are computed simultaneously.
+    \item A final multiplexer selects the correct operation output based on the \texttt{ALUOp} select lines.
+    \item The selected output from the multiplexer is then sent as the final ALU output.
+\end{itemize}
+
+
+\section{Addition-Subtraction Block}
+
+\begin{itemize}
+    \item The Addition-Subtraction block is responsible for performing addition, subtraction, set less than, and set less than unsigned operations.
+    \item A basic 64-bit adder is used to perform both addition and subtraction.
+    \item One of the operands is taken directly from the ALU input.
+    \item The other operand is selected through a multiplexer, whose two inputs are the second ALU input and its two’s complement (negative).
+    \item The select line for the multiplexer is controlled by the ALU Control unit, which determines whether an addition or subtraction operation is performed.
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/figs_abhimanyu/Addsub.png}
+    \caption{Addition-Subtraction Block}
+    \label{fig:addsub}
+\end{figure}
+
+\section{Shift Operations}
+
+\begin{itemize}
+    \item Shift operations are fundamental for bit manipulation and for efficiently performing multiplication or division by powers of two.
+    \item The RISC-V ISA supports three types of shift operations:
+    \begin{itemize}
+        \item Logical Left Shift (SLL)
+        \item Logical Right Shift (SRL)
+        \item Arithmetic Right Shift (SRA)
+    \end{itemize}
+    \item The logical left shift operation inserts zeros from the right as bits are shifted to the left. For a 64-bit operand, the shift amount can range from 0 to 63 bits.
+    \item The hardware design of the shift-left block implements this functionality efficiently, as shown in Figure~\ref{fig:shiftleft}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/figs_abhimanyu/ShiftLeft_nbits.png}
+    \caption{Shift Left Block}
+    \label{fig:shiftleft}
+\end{figure}
+
+\begin{itemize}
+    \item The shift right operation performs logical or arithmetic right shifts by inserting either zeros or ones from the left.
+    \item For a 64-bit operand, the shift amount also ranges from 0 to 63 bits.
+    \item A control signal determines the type of shift:
+    \begin{itemize}
+        \item Logical right shift inserts zeros from the left.
+        \item Arithmetic right shift inserts the most significant bit (MSB) from the operand to preserve the sign bit.
+    \end{itemize}
+    \item The design of the shift-right block implementing these functions is shown in Figure~\ref{fig:shiftright}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{report/figs_abhimanyu/Shiftright_nbits.png}
+    \caption{Shift Right Block}
+    \label{fig:shiftright}
+\end{figure}
+
+\section{Unsigned Multiplier}
+
+\begin{itemize}
+    \item The M-extension of the RISC-V ISA requires hardware support for multiplication operations.
+    \item The multiplier unit is designed to perform unsigned multiplication for 64-bit operands.
+    \item The multiplication is implemented using an iterative add-and-shift algorithm.
+    \item For two \(n\)-bit numbers \(A\) and \(B\), the product is computed as:
+    \[
+    P = \sum_{i=0}^{n-1} A \cdot B_i \cdot 2^i
+    \]
+    where \(B_i\) represents the \(i\)-th bit of \(B\).
+    \item The hardware repeatedly adds shifted versions of \(A\) based on the bits of \(B\), effectively accumulating the partial products.
+    \item Once all the partial sums are calculated, they are combined in a parallel manner to obtain the final result.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{report/figs_abhimanyu/Unsigned_multiplier.png}
+    \caption{Unsigned Multiplier Architecture}
+    \label{fig:multiplier}
+\end{figure}
+
+\begin{itemize}
+    \item For signed multiplication instructions (\texttt{MULH}, \texttt{MULHSU}), the operands are first converted to unsigned values.
+    \item The multiplication is then performed as an unsigned operation.
+    \item After the computation, the result is adjusted according to the original sign bits of the operands to produce the correct signed result.
+\end{itemize}
+
+\section{Unsigned Divider}
+
+\begin{itemize}
+    \item Division is a more complex arithmetic operation than multiplication and involves careful handling of corner cases.
+    \item The divider unit performs unsigned division and generates both the quotient and remainder.
+    \item It uses the restoring division algorithm to compute results efficiently in hardware.
+\end{itemize}
+
+For a given dividend \(N\) and divisor \(D\), the divider computes the quotient \(Q\) and remainder \(R\) such that:
+\[
+N = Q \cdot D + R, \quad 0 \leq R < D
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{report/figs_abhimanyu/Unsigned_divider.png}
+    \caption{Unsigned Divider Architecture}
+    \label{fig:divider}
+\end{figure}
+
+\begin{itemize}
+    \item The restoring division algorithm operates iteratively by subtracting the divisor from the partial remainder.
+    \item If the subtraction result is non-negative, a ‘1’ is inserted in the quotient and the partial remainder is updated.
+    \item If the result is negative, a ‘0’ is placed in the quotient and the partial remainder is restored to its previous value.
+    \item This process continues until all bits of the quotient have been determined.
+    \item The final remainder after completion of all iterations represents the true remainder of the division operation.
+\end{itemize}
+
+\chapter{Storing Data}
+
+\section{Register File}
+
+\begin{itemize}
+    \item The Register File consists of 64 registers in total.
+    \item The first 32 registers (\(x0\)–\(x31\)) are used for general-purpose integer operations.
+    \item The next 32 registers (\(f0\)–\(f31\)) are reserved for floating-point operations.
+    \item Register addresses are obtained directly from the instruction encoding fields.
+    \item For integer instructions, the register address from the instruction is used directly.
+    \item For floating-point instructions, the register file address is calculated by adding an offset of 32 to the base register address.
+    \item A small adder unit generates this offset by computing \(\text{address} + 32\).
+    \item A multiplexer selects between the unmodified integer address and the offset floating-point address.
+    \item The Control Unit provides a control signal that determines whether the instruction is integer-based or floating-point, thereby selecting the appropriate register set.
+\end{itemize}
+
+
+\section{Data Memory}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{report/figs_abhimanyu/data_memory.png}
+    \caption{Data Memory Architecture}
+    \label{fig:data_memory}
+\end{figure}
+
+\begin{itemize}
+    \item The Data Memory block is organised into eight parallel sub-blocks, each 8 bits wide.
+    \item This parallel design efficiently utilizes the physical characteristics of Block RAM (BRAM) on the PYNQ FPGA board for optimal performance.
+\end{itemize}
+
+\subsection{Address Mapping and Data Placement}
+
+\begin{itemize}
+    \item The lower three bits of the memory address (\texttt{[2:0]}) determine which sub-block receives or provides the data.
+    \item When \texttt{[2:0]} = \texttt{000}, data maps to the first block; when \texttt{[2:0]} = \texttt{001}, it maps to the second block, and so on up to the eighth block.
+    \item The number of sub-blocks accessed depends on the data width specified by the instruction:
+    \begin{itemize}
+        \item Byte operations (\texttt{lb}, \texttt{sb}): Utilize 1 sub-block (8 bits)
+        \item Half-word operations (\texttt{lh}, \texttt{sh}): Utilize 2 sub-blocks (16 bits)
+        \item Word operations (\texttt{lw}, \texttt{sw}): Utilize 4 sub-blocks (32 bits)
+        \item Double-word operations (\texttt{ld}, \texttt{sd}): Utilize 8 sub-blocks (64 bits)
+    \end{itemize}
+    \item If a memory access extends beyond the eighth sub-block (\texttt{[2:0]} > \texttt{111}), addressing wraps around to the first sub-block, maintaining a circular mapping structure.
+\end{itemize}
+
+\subsection{Performance Advantages}
+
+\begin{itemize}
+    \item The architecture is optimized for the pipelined BRAM on the PYNQ board, which typically requires two clock cycles to retrieve one byte in a linear configuration.
+    \item In a traditional setup, this causes memory operations to take more than three cycles to complete.
+    \item The implemented 8-way parallel architecture greatly reduces latency by allowing multiple bytes to be accessed simultaneously.
+    \item Load and store operations complete within a maximum of three clock cycles, and often faster depending on address alignment.
+    \item This design significantly enhances performance for memory-intensive instructions while maintaining RISC-V model compatibility.
+    \item To support a two-cycle stall during memory operations, a small counter (initialised to \texttt{100}) is used near the PC update point.
+    \item When the counter is not in its initial state, the PC value remains constant, and register file updates are temporarily disabled.
+    \item This counter-based stalling mechanism has not yet been implemented.
+\end{itemize}
+
+
+\chapter{FPU}
+Floating-point operations supported by the current FPU are,
+\begin{itemize}
+  \item Arithmetic: \texttt{fadd.s}, \texttt{fadd.d}, \texttt{fsub.s}, \texttt{fsub.d}, \texttt{fmul.s}, \texttt{fmul.d}, \texttt{fdiv.s}, \texttt{fdiv.d}
+  \item Square root: \texttt{fsqrt.s}, \texttt{fsqrt.d}
+  \item Min/Max: \texttt{fmin.s}, \texttt{fmin.d}, \texttt{fmax.s}, \texttt{fmax.d}
+  \item Comparison: \texttt{feq.s}, \texttt{feq.d}, \texttt{flt.s}, \texttt{flt.d}, \texttt{fle.s}, \texttt{fle.d}
+  \item Sign injection: \texttt{fsgnj.s}, \texttt{fsgnj.d}, \texttt{fsgnjn.s}, \texttt{fsgnjn.d}, \texttt{fsgnjx.s}, \texttt{fsgnjx.d}
+  \item Move: \texttt{fmv.x.d}, \texttt{fmv.d.x}
+  \item Conversions: \texttt{fcvt.l.d}, \texttt{fcvt.d.l}, \texttt{fcvt.s.d}, \texttt{fcvt.d.s}, \texttt{fcvt.s.w}, \texttt{fcvt.w.s}
+\end{itemize}
+
+
+\section{FPU Control Unit}
+\begin{enumerate}
+  \item \textbf{fadd.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00000 & 01 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fadd.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00000 & 00 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fsub.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00001 & 01 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fsub.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00001 & 00 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fmul.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00010 & 01 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fmul.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00010 & 00 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fdiv.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00011 & 01 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fdiv.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00011 & 00 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fsqrt.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & 00000 & rs1 & rm & rd & opcode \\
+      \hline
+      01011 & 01 & 00000 &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fsqrt.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & 00000 & rs1 & rm & rd & opcode \\
+      \hline
+      01011 & 00 & 00000 &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fmin.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00101 & 01 &  &  & 000 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fmin.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00101 & 00 &  &  & 000 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fmax.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00101 & 01 &  &  & 001 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fmax.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00101 & 00 &  &  & 001 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{feq.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      10100 & 01 &  &  & 010 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{feq.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      10100 & 00 &  &  & 010 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{flt.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      10100 & 01 &  &  & 001 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{flt.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      10100 & 00 &  &  & 001 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fle.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      10100 & 01 &  &  & 000 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fle.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      10100 & 00 &  &  & 000 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fsgnj.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00100 & 01 &  &  & 000 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fsgnj.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00100 & 00 &  &  & 000 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fsgnjn.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00100 & 01 &  &  & 001 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fsgnjn.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00100 & 00 &  &  & 001 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fsgnjx.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00100 & 01 &  &  & 010 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fsgnjx.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      00100 & 00 &  &  & 010 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fmv.x.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      11100 & 01 &  &  & 000 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fmv.d.x}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      11110 & 01 &  &  & 000 &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fcvt.l.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      11000 & 01 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fcvt.d.l}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      11010 & 01 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fcvt.w.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      11000 & 00 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fcvt.s.w}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      11010 & 00 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  \item \textbf{fcvt.s.d}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      01000 & 00 &  &  & rm &  & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+  \item \textbf{fcvt.d.s}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+      \hline
+      01000 & 01 &  &  & rm &   & 1010011 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+\end{enumerate}
+
+
+\subsubsection*{Internal FPU Opcode Mapping}
+
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Floating Point Instruction} & \textbf{FPU Opcode (\texttt{fpu\_op})} \\
+    \hline
+    \texttt{fadd.d}   & 000000 \\
+    \hline
+    \texttt{fadd.s}   & 000001 \\
+    \hline
+    \texttt{fsub.d}   & 000010 \\
+    \hline
+    \texttt{fsub.s}   & 000011 \\
+    \hline
+    \texttt{fmul.d}   & 000100 \\
+    \hline
+    \texttt{fmul.s}   & 000101 \\
+    \hline
+    \texttt{fdiv.d}   & 000110 \\
+    \hline
+    \texttt{fdiv.s}   & 000111 \\
+    \hline
+    \texttt{fsqrt.d}  & 001000 \\
+    \hline
+    \texttt{fsqrt.s}  & 001001 \\
+    \hline
+    \texttt{fmin.d}   & 010000 \\
+    \hline
+    \texttt{fmin.s}   & 010001 \\
+    \hline
+    \texttt{fmax.d}   & 010010 \\
+    \hline
+    \texttt{fmax.s}   & 010011 \\
+    \hline
+    \texttt{feq.d}    & 010100 \\
+    \hline
+    \texttt{feq.s}    & 010101 \\
+    \hline
+    \texttt{flt.d}    & 010110 \\
+    \hline
+    \texttt{flt.s}    & 010111 \\
+    \hline
+    \texttt{fle.d}    & 011000 \\
+    \hline
+    \texttt{fle.s}    & 011001 \\
+    \hline
+    \texttt{fsgnj.d}  & 011010 \\
+    \hline
+    \texttt{fsgnj.s}  & 011011 \\
+    \hline
+    \texttt{fsgnjn.d} & 011100 \\
+    \hline
+    \texttt{fsgnjn.s} & 011101 \\
+    \hline
+    \texttt{fsgnjx.d} & 011110 \\
+    \hline
+    \texttt{fsgnjx.s} & 011111 \\
+    \hline
+    \texttt{fmv.x.d}  & 100000 \\
+    \hline
+    \texttt{fmv.d.x}  & 100001 \\
+    \hline
+    \texttt{fcvt.l.d} & 100010 \\
+    \hline
+    \texttt{fcvt.d.l} & 100011 \\
+    \hline
+    \texttt{fcvt.s.d} & 100100 \\
+    \hline
+    \texttt{fcvt.d.s} & 100101 \\
+    \hline
+    \texttt{fcvt.s.w} & 100110 \\
+    \hline
+    \texttt{fcvt.w.s} & 100111 \\
+    \hline
+  \end{tabular}
+\end{table}
+\subsection*{Adder/Subtractor}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figs/fpadder.png}
+\end{figure}
+The following procedure was  (for illustrative purposes we consider 2.5 (\textbf{0x4004000000000000}) + 1.5 (\textbf{0x3ff8000000000000})
+\begin{enumerate}
+    \item \textbf{Exponent}
+    \begin{enumerate}
+        \item Exponent is the initially that of the larger number (In this case, it is that of 2.5 (\textbf{10000000000})).
+        \item It is later accordingly updated when calculating Mantissa.
+    \end{enumerate}
+    \item \textbf{Mantissa}
+    \begin{enumerate}
+        \item Shift the smaller (In this case, shift $1.5$ right by $\mathbf{10000000000} - \mathbf{01111111111}$ i.e. by 1)
+        \item Either Add or Subtract (based on Sign bits) (In this case, as both 1.5, 2.5 are of same sign we add, we obtain $\mathbf{10.110}$).
+        \item Normalize the Sum/Difference obtained (Shift sum left by 1, increment exponent by 1. Normalized Mantissa: $\mathbf{1.0110}$, Exponent: $\mathbf{10000000001}$ )
+        \item Round, then renormalize the output of normalizing unit (No need to round here)
+        \item Update exponent alongside normalizing, round
+    \end{enumerate}
+    \item \textbf{Sign}
+    \begin{enumerate}
+        \item Calculate \textbf{cntrl} bit which specifies the larger number
+        \item Output sign can be calculated combinationally as, 
+        \begin{verbatim}
+        (~(S_A ^ S_B) & (S_A & S_B)) | 
+        ((S_A ^ S_B) & (((~cntrl) & S_A) | (cntrl & S_B)));
+        \end{verbatim}
+        In this case, output sign bit is 0.
+    \end{enumerate}
+    Finally, we get output as,
+    \begin{table}[h]
+            \centering
+            \begin{tabular}{|c|c|c|}
+                \hline 
+                \textbf{Sign Bit} & \textbf{Exponent} & \textbf{Mantissa} \\
+                \hline
+                 0 &  10000000001 & 011000... \\
+                \hline
+            \end{tabular}
+        \end{table}
+    \newline Which comes out to be, $\mathbf{0x4010000000000000} = 4$
+    \textbf{Handling Infinites, NaNs: }
+    \begin{itemize}
+        \item If exactly one operand is infinity, output is infinity of the corresponding sign.
+        \item If both operands are infinities of the same sign, output is the same
+        \item If both operands are infinities of opposite signs, \textbf{NaN} is returned.
+        \item Exponent overflow is handled by setting the sum to infinity, exponent underflow is handled by setting the sum to zero.
+    \end{itemize}
+    Subtraction is handled by negating \textbf{rs2} operand and then passing operands to adder.
+\end{enumerate}
+\begin{itemize}
+    \item \textbf{Normalizing Logic: } In case subtraction ($1.M_X - 1.M_Y$) is performed, we can't directly determine location of the leading 1. So we scan for leading 1 (starting from MSB to LSB) and right shift the difference. In case of addition ($1.M_X + 1.M_Y$), we get 2 cases, (leading 1 is in bit 53 or is in the carry  i.e. $1.XXX\dots$ or $1X.XXX\dots$ (in which case we left shift)).
+    \item \textbf{Rounding: } RTNE (Round to nearest even) was implemented. There are issues in the rounding block as of now, it will be fixed soon.
+\end{itemize}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{FPU/report/figs/fpadder_tb.png}
+\end{figure}
+As mentioned above and observed in the test-bench, issues only arise due to rounding, it will be fixed soon.
+\pagebreak
+\subsection*{Multiplier}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FPU/report/figs/fpmul.png}
+\end{figure}
+The following procedure was  (for illustrative purposes we consider  1.5 (\textbf{0x3ff8000000000000}) * 5.0 (\textbf{0x4014000000000000})
+\begin{enumerate}
+    \item \textbf{Exponent}
+    \begin{enumerate}
+        \item Add both exponents and subtract bias (1023)(In this case, $\mathbf{10000000001} + \mathbf{01111111111} - \mathbf{1111111111}$).
+        \item It is later accordingly updated when calculating Mantissa.
+    \end{enumerate}
+    \item \textbf{Mantissa}
+    \begin{enumerate}
+        \item Multiply the 2 mantissas (In this case $\mathbf{1.010000} * \mathbf{1.100000} = 11.110...0$)
+        \item Normalize the product (In the example, shift product left by 1, increment exponent by 1. Normalized Mantissa: $\mathbf{1.111}$, Exponent: $\mathbf{10000000001}$ )
+        \item Round, then renormalize the output of normalizing unit (No need to round here)
+        \item Update exponent alongside normalizing, round
+    \end{enumerate}
+    \item \textbf{Sign}
+    \begin{enumerate}
+        \item Output sign can be calculated combinationally as by XOR'ing the sign bits of the 2 numbers, 
+        \begin{verbatim}
+        S_A ^ S_B
+        \end{verbatim}
+        In this example, output sign bit is 0.
+    \end{enumerate}
+    Finally, we get output as,
+    \begin{table}[h]
+            \centering
+            \begin{tabular}{|c|c|c|}
+                \hline 
+                \textbf{Sign Bit} & \textbf{Exponent} & \textbf{Mantissa} \\
+                \hline
+                 0 &  10000000001 & 11100... \\
+                \hline
+            \end{tabular}
+        \end{table}
+    \newline Which comes out to be, $\mathbf{0x401e000000000000} = 7.5$
+    \newline \textbf{Handling Infinites, NaNs: }
+    \begin{itemize}
+        \item If exactly one operand is infinity, output is infinity of the corresponding sign.
+        \item If both operands are infinities of the same sign, output is the same
+        \item If both operands are infinities of opposite signs, $-\infty$ is returned.
+        \item Exponent overflow is handled by setting the product to infinity, exponent underflow is handled by setting the product to zero.
+        \item $0 \times \infty$ cases are handled by returning \textbf{NaN}
+    \end{itemize}
+    Subtraction is handled by negating \textbf{rs2} operand and then passing operands to adder.
+\end{enumerate}
+\begin{itemize}
+    \item \textbf{Normalizing Logic: } Unlike addition and division, normalizing is simpler. When we multiply $1.M_X \times 1.M_Y$ output is either of the form $1.XXX\dots$ or $1X.XXX\dots$. In the later case, we need to shift left.
+    \item \textbf{Rounding: } RTNE (Round to nearest even) was implemented. There are issues in the rounding block as of now, it will be fixed soon.
+\end{itemize}
+\pagebreak
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FPU/report/figs/fpmul_tb.png}
+\end{figure}
+As mentioned above and observed in the test-bench, issues only arise due to rounding, it will be fixed soon.
+
+\pagebreak
+\subsection*{Divider}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FPU/report/figs/fpmul.png}
+\end{figure}
+The following procedure was  (for illustrative purposes we consider  1.5 (\textbf{0x3ff8000000000000}) / 5.0 (\textbf{0x4014000000000000} )
+\begin{enumerate}
+    \item \textbf{Exponent}
+    \begin{enumerate}
+        \item Subtract both exponents and add bias (1023)(In this case, $\mathbf{10000000001} - \mathbf{01111111111} + \mathbf{1111111111}$).
+        \item It is later accordingly updated when calculating Mantissa.
+    \end{enumerate}
+    \item \textbf{Mantissa}
+    \begin{enumerate}
+        \item Multiply the 2 mantissas (In this case $\mathbf{1.100000} / \mathbf{1.0100000} = 000\dots010011001100110011001100110011001100110011001100110011$)
+        \item Normalize the product (In the example, shift product left by 1, increment exponent by 1. \newline Normalized Mantissa: $\mathbf{1.0011001100110011001100110011001100110011001100110011}$, \newline Exponent: $\mathbf{01111111101}$ )
+        \item Round, then renormalize the output of normalizing unit (No need to round here)
+        \item Update exponent alongside normalizing, round
+    \end{enumerate}
+    \item \textbf{Sign}
+    \begin{enumerate}
+        \item Output sign can be calculated combinationally as by XOR'ing the sign bits of the 2 numbers, 
+        \begin{verbatim}
+        S_A ^ S_B
+        \end{verbatim}
+        In this example, output sign bit is 0.
+    \end{enumerate}
+    Finally, we get output as,
+    \begin{table}[h]
+            \centering
+            \begin{tabular}{|c|c|c|}
+                \hline 
+                \textbf{Sign Bit} & \textbf{Exponent} & \textbf{Mantissa} \\
+                \hline
+                 0 &  01111111101 & 0011001100110011001100110011001100110011001100110011 \\
+                \hline
+            \end{tabular}
+        \end{table}
+    \newline Which comes out to be, $\mathbf{0x3fd3333333333333} = 0.3$
+    \newline \textbf{Handling Infinites, NaNs: }
+    \begin{itemize}
+        \item If exactly one operand is infinity, output is infinity of the corresponding sign.
+        \item If both operands are infinities of the same sign, output is the same
+        \item If both operands are infinities of opposite signs, $-\infty$ is returned.
+        \item Exponent overflow is handled by setting the product to infinity, exponent underflow is handled by setting the product to zero.
+        \item $0 \times \infty$ cases are handled by returning \textbf{NaN}
+    \end{itemize}
+    Subtraction is handled by negating \textbf{rs2} operand and then passing operands to adder.
+\end{enumerate}
+\begin{itemize}
+    \item \textbf{Normalizing Logic: } Unlike addition and division, normalizing is simpler. When we multiply $1.M_X \times 1.M_Y$ output is either of the form $1.XXX\dots$ or $1X.XXX\dots$. In the later case, we need to shift left.
+    \item \textbf{Rounding: } RTNE (Round to nearest even) was implemented. There are issues in the rounding block as of now, it will be fixed soon.
+\end{itemize}
+\pagebreak
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FPU/report/figs/fpmul_tb.png}
+\end{figure}
+As mentioned above and observed in the test-bench, issues only arise due to rounding, it will be fixed soon.
+\pagebreak
+\subsection*{Square Root}
+There are quite a few ways to calculate square root of a floating point number. One way is \textbf{digit-by-digit} method. The below shows example usage of that method,
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.4\textwidth]{FPU/report/figs/dig.png}
+\end{figure}
+\newline However, this method is hardware heavy and involves multiple arithmetic operations. So we decided to do something different. 
+\subsubsection*{Quake 3}
+Quake 3 algorithm, also known as Fast Inverse Square Root algorithm is an algorithm to calculate the inverse square root of a number $i.e. x \rightarrow \dfrac{1}{\sqrt{x}}$. So we first perform $\dfrac{1}{x}$ and then take its inverse square root. This method trades accuracy for hardware efficiency. \newline
+This is the original quake 3 algorithm first discovered in the game "Quake 3 Arena". 
+\begin{verbatim}
+float Q_rsqrt( float number )
+{
+	long i;
+	float x2, y;
+	const float threehalfs = 1.5F;
+
+	x2 = number * 0.5F;
+	y  = number;
+	i  = * ( long * ) &y;                       // evil floating point bit level hacking
+	i  = 0x5f3759df - ( i >> 1 );               // what the f***?
+	y  = * ( float * ) &i;
+	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+
+	return y;
+}
+\end{verbatim}
+While an entire section can be added on the working principle of the algorithm, the use of magic numbers, approximations involved, etc but it as it isn't really pertinent to the overall project, so just the algorithm (taken as is from wikipedia) has been listed. While there is some error due to the approximations involved in this approach, but the overall error is much lesser than $1\%$. An additional iteration of Newton-Ralphson has been performed for the sake of improving accuracy. \newline \newline
+\textbf{Handling Infinites, NaNs: }
+    \begin{itemize}
+        \item If operand is infinity, infinity is returned.
+        \item Underflow cases have been handled by returning 0
+        \item Negative number cases are handled by returning \textbf{NaN}
+    \end{itemize}
+    Subtraction is handled by negating \textbf{rs2} operand and then passing operands to adder.
+\pagebreak
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{FPU/report/figs/fsqrt_tb.png}
+\end{figure}
+We can observe the accuracy tradeoff in the outputs. In the test bench, a tolerance of $0.1\%$ has been set.
+\pagebreak
+\subsection*{FCVT}
+\subsubsection*{FCVT.l.d}
+We recieve a floating point register as input and have to convert its double contents into integer (i.e. if we get say $0x4048800000000000$ (translates to 49.0 in double) as input, output general purpose point register should have $49 = 00\dots110001$). The procedure followed was (consider the example $121/7 = 17.2857142857 = \mathbf{0x40314924924914dd}$,
+\begin{itemize}
+    \item We know the number is of form $(\mathbf{S})1.(\mathbf{M})\times 2^{\mathbf{1023-E}}$
+    \item So we shift mantissa (1.Mantissa) required number of times. If there are still digits on the right of the decimal point, we have chosen to truncate it as a design choice. (On shifting we get,\newline  $\mathbf{10001.010010010010010010010010010010010001010011011101}$ \newline and after truncation $\mathbf{(10001)_2=17}$ 
+    \item Then based on sign bit we either take 2's complement or don't.
+    \item If input is $\pm \infty$, output in general purpose register will be the maximum representable positive or negative number respectively \newline $(\mathbf{0x800 0000 0000 0000} \text{ or } \mathbf{0x7FFF FFFF FFFF FFFF})$. For now, NaN inputs are returned as 0's but in the future we plan to add an exception for any NaN input.
+\end{itemize}
+\subsubsection*{FCVT.d.l}
+We recieve a general purpose register as input and have to convert its integer contents into floating point (i.e. if we get say $49$ as input, output floating point register should have $0x4048800000000000$ (translates to 49.0)). The procedure followed was (consider the example of $49 = 000110001$,
+\begin{itemize}
+    \item Find the leading 1 (done by using a lot of MUXs as every bit from MSB to LSB must be scanned)(In the chosen example, MSB is at index 5).
+    \item Consider everything on the right of the leading 1 to be part of mantissa (pad with zeros if length is insufficient)(In the example, Mantissa would be $\mathbf{1.100010000\cdots}$).
+    \item Position of leading 1 gives us exponent (In the example, exponent would be $5$ (index of leading 1) $+1023 = 1028 = \mathbf{10000000100}$
+    \item Sign can be found pretty easily (if negative, we chose to work with its 2's complement)
+    Hence we get the final result $\mathbf{0 10000000100 100010000\cdots} = 0x4048800000000000$.
+\end{itemize}
+\pagebreak
+\subsubsection*{Testbench}
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=1.2\textwidth]{FPU/report/figs/fcvtld.png}
+        \caption{fcvt.l.d test bench}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=1.2\textwidth]{FPU/report/figs/fcvtdl.png}
+        \caption{fcvt.d.l testbench}
+    \end{subfigure}
+\end{figure}
+\pagebreak
+\subsection*{Issues Faced}
+\begin{itemize}
+    \item There were no exact circuit diagrams for floating point multipliers, adders, dividers, etc so they had to be designed from scratch. Doing so led to some issues.
+    \item One instance was, during the design of floating point adder. Incorrect output appeared repeatedly due to the fact that leading 1 was not scanned properly in the normalizing unit. Generally, if signs of both numbers are same and addition has to happen in the \textbf{Add/Subtract} block, it would be of the form $\mathbf{1.M_1+1.M_2}$ which would at max be of the form $\mathbf{11.XXX}$ and we would only have to left shift once at max. However, when we subtract, result can  be lesser than $1$ as well, hence we have to scan every bit from MSB to LSB to find trailing 1. So designing the normalizing units appropriately for each operation was a little bit of a challenge.
+    \item Implementing rounding was a little bit of a challenge as well, as my initial approach was using k-maps which can quite easily go wrong. 
+    \item Calculating square root using digit-by-digit method would be more hardware intensive and would take up more LUTs, hence there had to be thorough research on other methods and tradeoffs between accuracy and hardware effeciency before finally deciding on using fast inverse square root algorithm.
+\end{itemize}
+\subsection*{Future Scope}
+\begin{itemize}
+    \item Currently, RTNE (round to nearest even) mode of rounding is used which currently isn't working. Method attempted was constructing a table of LSB, Round, Guard, Sticky bits and whether or not to add 1 and then use karnaugh-maps. So instead of solving using kmaps, we can use case statements instead as there is lesser chance of error. Also support for other rounding modes (like Round Down, Round Up, ROunt to Zero, etc) can be added.
+    \item Currently, only double type operations are supported (not float). So current functions will later be mmodified to support floating point instructions (32-bit) as well.
+    \item Currently only 7 instructions are supported,
+    \begin{enumerate}
+        \item fadd.d
+        \item fsub.d
+        \item fmul.d
+        \item fdiv.d
+        \item fsqrt.d
+        \item fcvt.l.d
+        \item fcvt.d.l
+    \end{enumerate}
+    Other floating point operations such as \textbf{feq, flt, fgt, fmadd, fsgnj}, etc can be added.
+    \item This is something which most definitely will not be done in the final version of the project but is something that would be fun to work on later. Each floating point component (fmul, fadd, etc) can be pipelined and made sequential to a clock of smaller period than internal clock. While this would require additional things like a synchronizer, it would lead to speed up in FPU.
+    \item When fdiv is called, the divider from ALU (which would otherwise be sitting idle) will be called to save LUTs. This should bring down LUT usage by about $10\%$
+\end{itemize}
+\chapter{The Datapath}
+\begin{figure}[H]
+    \flushleft
+    \includegraphics[width=1.2\linewidth]{report/figs_abhimanyu/datapath.png}
+    \caption{Complete Single-Cycle Processor Datapath}
+    \label{fig:datapath}
+\end{figure}
+
+\section{General Idea}
+The pipeline works basically as follows
+
+\begin{enumerate}
+    \item The instruction is first fetched from the instruction memory using the Program Counter (PC) as the address.
+    \item The fetched instruction is then stored in the IF/ID pipeline register during the same clock cycle.
+    \item The instruction is then sent to three main units:
+    \begin{itemize}
+        \item Control Unit
+        \item Immediate Generator
+        \item Instruction Parser
+    \end{itemize}
+    \item The Control Unit decodes the instruction and generates all necessary control signals for the subsequent pipeline stages.
+    \item The Instruction Parser separates the instruction into its fundamental fields --- Source Register 1, Source Register 2, and Destination Register.
+    \item The Immediate Generator produces the immediate value corresponding to the instruction type, based on the Opcode, and outputs it.
+    \item The register addresses obtained from the parsed instruction are sent to the Register File.
+    \item The Register File then reads and outputs the values stored in the specified registers.
+    \item The branching logic receives these register values and, depending on the instruction, may update the Program Counter (PC) accordingly.
+    \item The ALU operation codes (ALU-Opcodes) are also generated during this stage.
+    \item All relevant data and control signals are then stored in the ID/EX pipeline register for the next stage.
+    \item The ALU-FPU unit performs the required arithmetic or logical operation using the values and Opcode received from the ID/EX register.
+    \item The result from the ALU-FPU unit is then stored in the EX/MEM pipeline register.
+    \item If the instruction involves memory access, the address and data from the EX/MEM register are sent to the Data Memory unit.
+    \item If no memory operation is required, the computed values are simply bypassed to the next stage and stored in the MEM/WB register.
+    \item Finally, the values from the MEM/WB stage, along with the destination register identifier, are sent back to the Register File, where the result is written back to complete the instruction execution.
+\end{enumerate}
+
+\section{R-format and Floating-point Instruction Path}
+
+\begin{figure}[H]
+    \flushleft
+    \includegraphics[width=1.2\linewidth]{report/figs_abhimanyu/R-Format.png}
+    \caption{R-format Datapth}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{enumerate}
+    \item Instruction fetch and IF/ID register
+    \begin{itemize}
+        \item The instruction is retrieved from the Instruction Memory using the PC.
+        \item The fetched instruction is stored in the IF/ID register.
+    \end{itemize}
+
+    \item Instruction decode and register read (ID stage)
+    \begin{itemize}
+        \item The instruction in IF/ID is sent to the Control Unit and the Instruction Parser.
+        \item The Instruction Parser outputs the proper register addresses (source and destination).
+        \item Those register addresses are presented to the Register File, which reads and outputs the corresponding register values.
+        \item The read values, the destination register address, and the ALU-FPU Control output are stored together in the ID/EX register.
+    \end{itemize}
+
+    \item Execute (EX stage)
+    \begin{itemize}
+        \item Values from ID/EX are sent to the ALU-FPU unit.
+        \item The ALUSrc control flag and the ALUOp signals (from the ALU-FPU Control) determine the correct operation to be performed on the input values.
+        \item The ALU-FPU result is saved to the EX/MEM register.
+        \item The destination register address is forwarded to the EX/MEM register as well.
+    \end{itemize}
+
+    \item Memory stage (MEM stage)
+    \begin{itemize}
+        \item R-format instructions do not require data memory access.
+        \item Consequently, the computed result is bypassed (no memory operation) and transferred to the MEM/WB register along with the destination register address.
+    \end{itemize}
+
+    \item Write back (WB stage)
+    \begin{itemize}
+        \item The result in MEM/WB and the destination register address are provided to the Register File.
+        \item The Register File performs the write-back, updating the proper destination register.
+        \item Note: the write-back occurs only at this final stage.
+    \end{itemize}
+\end{enumerate}
+
+\section{I-format Instruction Path}
+
+\begin{figure}[H]
+    \flushleft
+    \includegraphics[width=1.2\linewidth]{report/figs_abhimanyu/I-format_wo_load_jalr.png}
+    \caption{I-format Datapth without load and jalr}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{figure}[H]
+    \flushleft
+    \includegraphics[width=1.2\linewidth]{report/figs_abhimanyu/load.png}
+    \caption{Load Datapath}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{figure}[H]
+    \flushleft
+    \includegraphics[width=1.2\linewidth]{report/figs_abhimanyu/jalr.png}
+    \caption{Jalr Datapath}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{enumerate}
+    \item Instruction fetch and IF/ID register
+    \begin{itemize}
+        \item The instruction is retrieved from the Instruction Memory using the Program Counter (PC).
+        \item The fetched instruction is stored in the IF/ID register, similar to the R-format instruction path.
+    \end{itemize}
+
+    \item Instruction decode and register read (ID stage, excluding \texttt{jalr} instruction)
+    \begin{itemize}
+        \item The instruction in the IF/ID register is sent to the Control Unit, Instruction Parser, and Immediate Generation block.
+        \item The Instruction Parser identifies the required register addresses (one source and one destination).
+        \item The source register address is given to the Register File, which reads and outputs the corresponding register value.
+        \item The read value, the generated immediate value, the destination register address, and the ALU-FPU Control output are all stored together in the ID/EX register.
+    \end{itemize}
+
+    \item Execute (EX stage, excluding \texttt{jalr} instruction)
+    \begin{itemize}
+        \item The values from the ID/EX register are sent to the ALU-FPU unit.
+        \item The ALUSrc control flag ensures that the immediate value is selected instead of a second source register value (which is not used in this instruction type).
+        \item The ALUOp signals, provided by the ALU-FPU Control, determine the specific operation to be performed on the input operands.
+        \item The resulting value computed by the ALU-FPU unit is stored in the EX/MEM register.
+        \item The destination register address is also forwarded to the EX/MEM register.
+    \end{itemize}
+
+    \item Memory and write-back stages (excluding load and \texttt{jalr} instructions)
+    \begin{itemize}
+        \item The remaining stages proceed in the same manner as in the R-format instruction path.
+        \item The result is transferred to the MEM/WB register, and finally, it is written back to the destination register in the Register File during the write-back stage.
+    \end{itemize}
+
+    \item Memory stage (load instructions)
+    \begin{itemize}
+        \item The result from the EX/MEM register (computed address) is sent to the Address port of the Data Memory.
+        \item The signal \texttt{MemWrite} is turned off so that no value is written to memory. The result from the Data Memory is then sent to the MEM/WB register to store it.
+    \end{itemize}
+
+    \item Write-back stage (load instructions)
+    \begin{itemize}
+        \item The result from Data Memory is retrieved from the MEM/WB register and then sent back to the Register File along with the destination register address to write the required data.
+    \end{itemize}
+
+    \item Instruction decode stage for \texttt{jalr} instruction
+    \begin{itemize}
+        \item Since \texttt{jalr} stores PC + 4 in the destination register, the PC value is passed to the ID/EX register.
+        \item Since the PC updates to become \texttt{rs1 + immediate}, a multiplexer is used to select between \texttt{rs1} or PC (for J-format instructions explained below).
+        \item The multiplexer result is added with the immediate, which then is unconditionally set as the new PC (the procedure for unconditionally setting PC is explained in the J-format instruction path).
+    \end{itemize}
+
+    \item Execute, Memory and Write-back stages for \texttt{jalr} instruction
+    \begin{itemize}
+        \item The value PC + 4 is calculated through a small adder (which is used for J-format instructions as well), and it is passed on through the pipeline registers to the last stage.
+        \item Just before the MEM/WB register, a few multiplexers are present to select the PC + 4 value from the values generated by U-format instructions.
+        \item This result is written back to the Register File in the same way as any other write-back operation.
+    \end{itemize}
+\end{enumerate}
+
+\section{B-format Instruction Path}
+
+\begin{figure}[H]
+    \flushleft
+    \includegraphics[width=1.2\linewidth]{report/figs_abhimanyu/B-format.png}
+    \caption{B-format Datapath}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{enumerate}
+    \item Instruction fetch and IF/ID register
+    \begin{itemize}
+        \item The instruction is retrieved from the Instruction Memory using the Program Counter (PC).
+        \item The fetched instruction is stored in the IF/ID register, similar to the R-format and I-format instruction paths.
+        \item The current PC value is also stored in the IF/ID register for later use.
+    \end{itemize}
+
+    \item Instruction decode and register read (ID stage)
+    \begin{itemize}
+        \item The instruction in the IF/ID register is sent to the Control Unit, Instruction Parser, and Immediate Generation block.
+        \item The Instruction Parser identifies the required register addresses (two source registers).
+        \item The source register addresses are given to the Register File, which reads and outputs the corresponding register values.
+        \item These values are sent to the Comparator unit. The Comparator checks the difference between the two source register values and produces three flags: Negative, Zero, and Negative (unsigned interpretation). Each flag is represented as 1 if true and 0 if false.
+        \item The flags are provided as input to the Branch Control Unit. Based on the signal received from the Control Unit, the Branch Control determines whether the branch condition is satisfied. The branch condition is communicated to Branch Control by the Control Unit. 
+        \item In parallel, the value of PC + Immediate is computed to obtain the target branch address.
+        \item Once the branch condition result is known, a control signal is sent to a multiplexer (MUX) that selects either PC + 4 (next sequential instruction) or the calculated PC + Immediate (branch target).
+        \item Since the outcome of the branch is determined only after the B-format instruction reaches the ID stage, a stall must be introduced immediately after a B-format instruction to prevent fetching an incorrect instruction.
+    \end{itemize}
+
+    \item Execute, Memory, and Write-back stages
+    \begin{itemize}
+        \item The remaining pipeline stages after the ID stage do not perform any meaningful operations for B-format instructions.
+        \item Therefore, all control signals are turned off, and no updates occur in either the Data Memory or the Register File.
+    \end{itemize}
+\end{enumerate}
+
+\section{J-format Instruction Path}
+
+\begin{figure}[H]
+    \flushleft
+    \includegraphics[width=1.2\linewidth]{report/figs_abhimanyu/J-format.png}
+    \caption{J-format Datapath}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{enumerate}
+    \item Instruction fetch and IF/ID register
+    \begin{itemize}
+        \item The instruction is retrieved from the Instruction Memory using the Program Counter (PC).
+        \item The fetched instruction is stored in the IF/ID register, similar to the R-format and I-format instruction paths.
+        \item The current PC value is also stored in the IF/ID register for use in subsequent stages.
+    \end{itemize}
+
+    \item Instruction decode and register read (ID stage)
+    \begin{itemize}
+        \item The instruction in the IF/ID register is sent to the Control Unit, Instruction Parser, and Immediate Generation block.
+        \item The Instruction Parser identifies the register addresses required and provides them to the Register File.
+        \item The Register File reads and outputs the corresponding register values.
+        \item The Immediate Generation block computes the immediate value specific to the instruction format.
+        \item The value of PC + Immediate is calculated to determine the target jump address.
+        \item The Control Unit sends a signal called JalSrc, which is logically ORed with the output of the Branch Control Unit. This ensures that the PC always jumps to PC + Immediate, making the jump instruction unconditional.
+        \item The PC value and the destination register information are stored in the ID/EX register so that PC + 4 can be written back to the destination register.
+        \item Since it is not known during the fetch stage whether the instruction is of J-format type, the next instruction fetched will be from PC + 4. Therefore, once the J-format instruction is decoded, the incorrect instruction must be flushed, and a stall must be introduced after J-format instructions to maintain correct execution flow.
+    \end{itemize}
+
+    \item Execute stage
+    \begin{itemize}
+        \item The value of PC + 4 is computed using a small adder, independent of the ALU-FPU unit.
+        \item The JumpSrc control signal selects PC + 4 as the value to be written back instead of the ALU-FPU output, using a multiplexer (MUX).
+        \item This selected value is passed forward to the EX/MEM register.
+    \end{itemize}
+
+    \item Memory and write-back stages
+    \begin{itemize}
+        \item The remaining stages operate similarly to the R-format instruction path.
+        \item The result is passed to the MEM/WB register and, during the write-back stage, is written to the destination register in the Register File.
+    \end{itemize}
+\end{enumerate}
+
+
+\section{S-format Instruction Path}
+\begin{figure}[H]
+    \flushleft
+    \includegraphics[width=1.2\linewidth]{report/figs_abhimanyu/S-format.png}
+    \caption{S-format Datapath}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{enumerate}
+    \item Instruction fetch and IF/ID register
+    \begin{itemize}
+        \item The instruction is retrieved from the Instruction Memory using the Program Counter (PC).
+        \item The fetched instruction is stored in the IF/ID register, similar to the R-format and I-format instruction paths.
+    \end{itemize}
+
+    \item Instruction decode and register read (ID stage)
+    \begin{itemize}
+        \item The instruction in the IF/ID register is sent to the Control Unit, Instruction Parser, and Immediate Generation block.
+        \item The Instruction Parser identifies the required register addresses (source registers) and provides them to the Register File.
+        \item The Register File reads and outputs the corresponding register values.
+        \item The Immediate Generation block computes the immediate value specific to the S-format instruction.
+        \item The values fetched from the source registers, along with the generated immediate, are stored in the ID/EX register.
+    \end{itemize}
+
+    \item Execute stage
+    \begin{itemize}
+        \item The ALUOp signal is configured such that the ALU performs an addition of the immediate value and the value from source register 1, both retrieved from the ID/EX register.
+        \item The resulting address calculated by the ALU is stored in the EX/MEM register.
+        \item The value from source register 2 is also stored in the EX/MEM register along with the computed address.
+    \end{itemize}
+
+    \item Memory stage
+    \begin{itemize}
+        \item The result from the EX/MEM register (computed address) is sent to the Address port of the Data Memory.
+        \item The value from source register 2 is provided to the Write Data port of the Data Memory.
+        \item The signal MemWrite, propagated through the pipeline registers from the Control Unit, is asserted to enable writing of the data into the Data Memory at the specified address.
+    \end{itemize}
+
+    \item Write-back stage
+    \begin{itemize}
+        \item Since S-format instructions do not write any result back to the Register File, no meaningful data is written.
+        \item The RegWrite signal is deasserted (set to 0) to ensure that no unintended or garbage values are written to any register.
+    \end{itemize}
+\end{enumerate}
+
+
+\section{U-format Instruction Path}
+\begin{figure}[H]
+    \flushleft
+    \includegraphics[width=1.2\linewidth]{report/figs_abhimanyu/lui.png}
+    \caption{lui Datapath}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{figure}[H]
+    \flushleft
+    \includegraphics[width=1.2\linewidth]{report/figs_abhimanyu/auipc.png}
+    \caption{auipc Datapath}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{enumerate}
+    \item Instruction fetch and IF/ID register
+    \begin{itemize}
+        \item The instruction is retrieved from the Instruction Memory using the Program Counter (PC).
+        \item The fetched instruction is stored in the IF/ID register, similar to the R-format and I-format instruction paths.
+    \end{itemize}
+
+    \item Instruction decode and register read (ID stage)
+    \begin{itemize}
+        \item The instruction in the IF/ID register is sent to the Control Unit, Instruction Parser, and Immediate Generation block.
+        \item The Instruction Parser identifies the destination register address and provides it to the Register File.
+        \item The Immediate Generation block computes the immediate value specific to the U-format instruction.
+        \item The PC value and the generated immediate value, are stored in the ID/EX register.
+    \end{itemize}
+
+    \item Execute stage
+    \begin{itemize}
+        \item There is almost no work for the ALU in this Instruction.
+        \item The PC, Immediate value and the destination register address is simply passed forward to the  EX/MEM register
+    \end{itemize}
+
+    \item Memory stage
+    \begin{itemize}
+        \item A small dedicated unit does the computation required for the auipc instruction, whose inputs will be the PC and the immediate value.
+        \item A couple of Multiplexers are used to select the value to be stored in the destination register.
+        \item This value is now passed to the MEM/WB register along with destination register address.
+    \end{itemize}
+
+    \item Write-back stage
+    \begin{itemize}
+        \item Similar to any other instruction that requires write back, the value is sent to Register file along with the destination register address.
+    \end{itemize}
+\end{enumerate}
+
+\chapter{Hazard Detection and Speedups}
+
+\section{Hazards}
+\begin{enumerate}
+    \item Data Hazards
+    \begin{itemize}
+        \item Data hazards occur when a value required by an instruction is not yet written back to the register file.
+        \item In such cases, the hazard detection block inserts \texttt{nop} instructions by resetting the pipeline registers after the data hazard until the value is written back properly.
+        \item The inputs to the hazard detection block are the values of the control signals from each of the pipeline registers, except for the IF/ID register (since no control signal is generated there).
+    \end{itemize}
+
+    \item Control Hazards
+    \begin{itemize}
+        \item Control hazards occur when the Program Counter (PC) is not updated correctly.
+        \item This typically occurs with branch and jump instructions, since the new PC value cannot be determined in advance.
+        \item To resolve this, the IF/ID register is reset so that a \texttt{nop} instruction replaces the next instruction (PC + 4), ensuring that the correct instruction at PC + immediate is fetched next.
+    \end{itemize}
+\end{enumerate}
+
+\section{Forwarding}
+\begin{itemize}
+    \item Instead of inserting \texttt{nop} instructions in the pipeline, a Forwarding Unit is used to transfer values that have not yet been written back.
+    \item Since B-format instructions and \texttt{jalr} instructions are handled in the ID stage, if the source register value is not yet written back, the value from the source register is provided to the ID stage from the EX, MEM, or WB stages. Similarly, for arithmetic instructions, the values are provided from the MEM and WB stages.
+    \item These forwarded values are passed through a multiplexer, whose output is selected by the Forwarding Unit.
+    \item The inputs to the Forwarding Unit include source register addresses and destination register addresses from the ID stage and EX stage, as well as destination registers from the MEM and WB stages.
+    \item The Forwarding Unit checks whether the destination register in a later stage is being used as a source register in any of the earlier stages. If such a condition is detected, the value from the later stage is selected for forwarding.
+\end{itemize}
+
+\section{Branch Prediction}
+\begin{itemize}
+    \item A technique called Adaptive Prediction is used for branch prediction.
+    \item In this technique, the predictor monitors each branch instruction and records whether the instruction was taken or not in previous executions. When a similar sequence of outcomes reoccurs, the predictor uses this stored information to predict the next branch behavior.
+    \item In the given processor, the results of the last four branch instructions are tracked, and a small table stores the predicted outcome of the next branch instruction. When the same sequence reappears, the prediction from the table is used.
+    \item A minor modification is made in the Hazard Detection Unit so that a \texttt{nop} is inserted only when the prediction fails; otherwise, execution proceeds normally.
+\end{itemize}
+
+\part{FPGA Working and Setup - PYNQ Z2}
+\section{FPGA Organization}
+Pynq z2 is divided into 2 major parts - the \textbf{PS} (Processing System which is basically an ARM Cortex chip ) and the \textbf{PL} (Programmable logic). PL is the actual FPGA fabric upon which the RTL is layed upon.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{report/figs_agam/zynq.png}
+\end{figure}
+PS has contact with the PL via the \textbf{AXI} interface inorder to debug/test our PL logic and for external I/O interfacing.
+\section{FPGA configuration in Vivado}
+After selecting appropriate board files in the setup menu, we have to now configure the AXI interface to work with our processor core seamlessly. We do this through \textbf{Block designs} in Vivado.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{report/figs_agam/zynqbd.png}
+\end{figure}
+The processing system IP is the main PS of the board itself which will end up controlling the PL through AXI BRAM Controllers.
+
+\textbf{Proposed Architecture for interfacing:} The core has multiple exposed memory pins which will connect with the AXI BRAM controllers. This type of exposing will be done both for instruction and data memory.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{report/figs_agam/corebd.png}
+\end{figure}
+TODO: remove the extra debugs which are not needed for proper execution.
+
+Now appropriate AXI BRAM controllers have to be generated both for Data Memory and Instruction memory. Note that minimum bit width support for AXI bram controllers is 32. Instruction memory bit width is exactly 32 so it works out, but for data memory some map is done so that the controller only accesses bytes.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{report/figs_agam/axidatabram.png}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{report/figs_agam/axiinstrbram.png}
+\end{figure}
+
+\textbf{IMPORTNANT NOTE:} AXI bram controllers are WORD ADDRESSABLE as opposed to byte addressable, so a suitable mapping has been done in vivado (essentially shift by 4).
+
+Running connection automation for the AXI interface (automatically in vivado its done) and manual connection from core exposed wires.
+
+Finally, to actually reset/running pins for the processor, and AXI GPIO interface has to be setup.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{report/figs_agam/axirst.png}
+\end{figure}
+Note that on startup rst = 1 and running = 0.
+
+\section{FPGA booting}
+For booting the PS, debian is flashed onto the sd card, which will run on the PS. Via ethernet the HARDWARE HANDOFF FILES along with the BITSTREAM FILES will be 
+
+\part{Testing}
+\chapter{ALU, FPU}
+\section{ALU}
+\subsection{Arithmetic (No Immediate)}
+\textbf{Addition, Subtraction, Multiplication, Division} 
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/alu_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_sim_1.png}
+    \end{figure}
+This shows and verifies the working of ALU for basic \textbf{add, sub, mul, div} operations.
+\subsection{Logical Operations}
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/alu_2.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_sim_1.png}
+    \end{figure}
+The working and verification of logical operations (\textbf{AND, OR, XOR} have been shown.
+\subsection{Shift Operations}
+Three shift operations are offered,
+\begin{enumerate}
+    \item \textbf{sll} (Shift left logical) - shifts the number left (shifted bits are padded with 0)
+    \item \textbf{srl} (Shift right logical) - shifts the number right and pads the shifted bits with 0
+    \item \textbf{sra} (Shift right arithmetic) - shifts the number right and pads the shifted bits with previous MSB. This is particularly useful when performing arithmetic operations (right shift equals division by 2).
+\end{enumerate}
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/alu_4.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_sim_1.png}
+    \end{figure}
+\subsection{Immediate Operations}
+The following immediate operations are allowed (\textbf{12-bit immediate},
+\begin{enumerate}
+    \item Addition
+    \item AND
+    \item OR 
+    \item XOR 
+    \item Shift left
+    \item Shift right logical (i.e. fill with zeros)
+    \item Shift right arithmetic (i.e. fill with MSB)
+\end{enumerate}
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/alu_3.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_sim_1.png}
+    \end{figure}
+This shows and verifies the working of ALU for basic \textbf{andi, ori, xori, addi, slli, srai, srli}.
+\section{FPU}
+\subsection{Arithmetic}
+\subsubsection{Add-Sub}
+\begin{enumerate}
+    \item \textbf{Addition-Subtraction : Double} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_inhouse_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_sim_1.png}
+    \end{figure}
+    \item \textbf{Addition-Subtraction : Double (Edge Cases)} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_inhouse_2.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_sim_2.png}
+    \end{figure}
+    Couple of things to note here. As per IEEE-754 convention, \textbf{NaN} is returned when either operand is a \textbf{NaN} or infinities of opposite signs are added. Addition to infinity results in infinity (of the same sign).
+    \item \textbf{Addition-Subtraction : Single} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_inhouse_3.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_sim_3.png}
+    \end{figure}
+    \item \textbf{Addition-Subtraction : Single (Edge Cases)} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_inhouse_4.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fadd_sim_4.png}
+    \end{figure}
+    The one mismatch observed between simulation and implementation is because of different \textbf{NaN}s being used (i.e. both are NaNs just different ones). \newline
+    Whatever is observe in double precision regarding regular comparisions (\textbf{fadd, fsub}), Infinities, NaNs is extended to single precision as well. Results obtained via our FPU and inhouse-RISC V simulator are verified to be the same for a variety of inputs in both single and double precision.
+    
+\end{enumerate}
+\subsubsection{Mul-Div}
+\begin{enumerate}
+    \item \textbf{Multiplication-Division : Double} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmul_inhouse_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmul_sim_1.png}
+    \end{figure}
+    \item \textbf{Multiplication-Division : Double (Edge Cases)} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmul_inhouse_2.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmul_sim_2.png}
+    \end{figure}
+    A couple of points to note here is that,
+    \begin{itemize}
+        \item \textbf{NaN} multiplied or divided by any number will return \textbf{NaN}
+        \item Zero-by-zero and infinity-by-infinity forms return \textbf{NaN}
+        \item Dividing a normal (non-zero non-NaN) number by infinity returns 0 and dividing by 0 returns infinity.
+        \item Multiplying a non-NaN number with infinity returns infinity (of appropriate sign)
+    \end{itemize}
+    \item \textbf{Multiplication-Division : Single} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmul_inhouse_3.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmul_sim_3.png}
+    \end{figure}
+    \item \textbf{Multiplication-Division : Single (Edge Cases)} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmul_inhouse_4.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmul_sim_4.png}
+    \end{figure}
+    Whatever is observe in double precision regarding regular comparisions (\textbf{fmul, fdiv}), Infinities, NaNs is extended to single precision as well. Results obtained via our FPU and inhouse-RISC V simulator are verified to be the same for a variety of inputs in both single and double precision.
+\end{enumerate}
+\subsubsection{Sqrt}
+\begin{enumerate}
+    \item \textbf{Square Root: Double (with edge cases)} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsqrt_inhouse_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsqrt_sim_1.png}
+    \end{figure}
+    Trying to take square root of either a \textbf{NaN} or a negative number will return \textbf{NaN} as the result. Similarly, taking square root of $+\infty$ will return $+\infty$. As fast inverse square root has been used to approximate square root for faster calculation, there is some mismatch in simulator and obtained values. The percent error comes out to be around $5\%$.
+   \begin{table}[h]
+        \centering
+        \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{Register} & \textbf{Expected (Hex)} & \textbf{Vivado (Hex)} & \textbf{Error (\%)} \\
+        \hline
+        f10 & \texttt{0x402639e2653e421b} & \texttt{0x4026a0b12b34b300} & 1.8068 \\
+        \hline
+        f11 & \texttt{0x3ffc5bf738554200} & \texttt{0x3ffcbbb798b6fd09} & 1.3017\\
+        \hline
+        f12 & \texttt{0x4018fae0b72ceab4} & \texttt{0x4019ca7eafe154de} & 3.1445 \\
+        \hline
+        \end{tabular}
+    \end{table}
+    It is important to note that for the most part error is less than $5\%$. Accuracy can be improved by performing one-two iterations of newton-ralphson. But we have chosen not to do so as it still requires a few multiplications. The current algorithm only requires one shift and one subtraction. 
+    \item \textbf{Square Root: Double (with edge cases)} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsqrt_inhouse_2.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsqrt_sim_2.png}
+    \end{figure}
+    Trying to take square root of either a \textbf{NaN} or a negative number will return \textbf{NaN} as the result. Similarly, taking square root of $+\infty$ will return $+\infty$. As fast inverse square root has been used to approximate square root for faster calculation, there is some mismatch in simulator and obtained values. The percent error comes out to be around $5\%$.
+   \begin{table}[h]
+        \centering
+        \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{Register} & \textbf{Expected (Hex)} & \textbf{Vivado (Hex)} & \textbf{Error (\%)} \\
+        \hline
+        f10 & \texttt{0x000000004131cf13} & \texttt{0x00000000413504e3} & 1.7734 \\
+        \hline
+        f11 & \texttt{0x000000003fe2dfbf} & \texttt{0x000000003fe5dd19} & 1.3006\\
+        \hline
+        f12 & \texttt{0x0000000040c7d706} & \texttt{0x0000000040ce534f} & 3.1433 \\
+        \hline
+        \end{tabular}
+    \end{table}
+    It is important to note that for the most part error is less than $5\%$. Accuracy can be improved by performing one-two iterations of newton-ralphson. But we have chosen not to do so as it still requires a few multiplications. The current algorithm only requires one shift and one subtraction.\newline
+    Whatever is observe in double precision regarding regular comparisions (\textbf{fsqrt}), Infinities, NaNs is extended to single precision as well. Results obtained via our FPU and inhouse-RISC V simulator are verified to be within a tolerable error range for a variety of inputs in both single and double precision.
+\end{enumerate}
+\subsection{Min-Max}
+\begin{enumerate}
+    \item \textbf{Min-Double} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmin_inhouse_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmin_sim_1.png}
+    \end{figure}
+    \item \textbf{Min-Double (Edge Cases)} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmin_inhouse_2.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmin_sim_2.png}
+    \end{figure}
+    It is an IEEE convention to always return the non-\textbf{NaN} number when comparing a \textbf{NaN} and a regular number.
+    \item \textbf{Min-Single} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmin_inhouse_3.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmin_sim_3.png}
+    \end{figure}
+    \item \textbf{Min-Single (Edge Cases)} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmin_inhouse_4.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmin_sim_4.png}
+    \end{figure}
+    Whatever is observe in double precision regarding regular conversions, Infinities, NaNs is extended to single precision as well. Results obtained via our FPU and inhouse-RISC V simulator are verified to be the same for a variety of inputs in both single and double precision.
+\end{enumerate}
+\subsection{Comparison}
+\begin{enumerate}
+    \item \textbf{feq flt fle: Double} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/feq_inhouse_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/feq_sim_1.png}
+    \end{figure}
+    \item \textbf{feq flt fle: Double (Edge Cases)} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/feq_inhouse_2.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/feq_sim_2.png}
+    \end{figure}
+    One thing to note is that as per IEEE-754 convention, comparing 2 different \textbf{NaN}s will result in false, comparing a \textbf{NaN} and a regular number will just result in the result being false as well.
+    \item \textbf{feq flt fle: Single} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/feq_inhouse_3.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/feq_sim_3.png}
+    \end{figure}
+    \item \textbf{feq flt fle: Single (Edge Cases)} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/feq_inhouse_4.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/feq_sim_4.png}
+    \end{figure}
+    Whatever is observe in double precision regarding regular comparisions (\textbf{feq, flt, fle}), Infinities, NaNs is extended to single precision as well. Results obtained via our FPU and inhouse-RISC V simulator are verified to be the same for a variety of inputs in both single and double precision.
+\end{enumerate}
+\subsection{Sign Injection}
+\begin{enumerate}
+    \item \textbf{fsgnj fsgnjn fsgnjx: Double}\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsgnj_inhouse_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsgnj_sim_1.png}
+    \end{figure}
+    \item \textbf{fsgnj fsgnjn fsgnjx: Double (Edge Cases)}\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsgnj_inhouse_2.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsgnj_sim_2.png}
+    \end{figure}
+    One thing to note here is that when \textbf{fs2} is a \textbf{NaN} we still read its sign and consider it.
+    \item \textbf{fsgnj fsgnjn fsgnjx: Single}\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsgnj_inhouse_3.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsgnj_sim_3.png}
+    \end{figure}
+    \item \textbf{fsgnj fsgnjn fsgnjx: Single (Edge Cases)}\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsgnj_inhouse_4.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fsgnj_sim_4.png}
+    \end{figure}
+    Whatever is observe in double precision regarding regular comparisions (\textbf{fsgnj, fsgnjn, fsgnjx}), Infinities, NaNs is extended to single precision as well. Results obtained via our FPU and inhouse-RISC V simulator are verified to be the same for a variety of inputs in both single and double precision.
+\end{enumerate}
+\subsection{Move and Convert}
+\subsubsection{Move}
+\begin{enumerate}
+    \item \textbf{GPR to FPR}\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmv_inhouse_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmv_sim_1.png}
+    \end{figure}
+    \item \textbf{FPR to GPR} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmv_inhouse_2.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmv_sim_2.png}
+    \end{figure}
+    \item \textbf{GPR to FPR}\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmv_inhouse_3.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmv_sim_3.png}
+    \end{figure}
+    \item \textbf{FPR to GPR} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmv_inhouse_4.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fmv_sim_4.png}
+    \end{figure}
+    We observe that data is being moved to and from \textbf{GPR} (General Purpose Registers) and \textbf{FPR} (Floating Point Registers) accurately. Functioning of \textbf{fmv} function is verified. As a design choice, it has been chosen to offer only 2 \textbf{fmv} functions (all the others can be implemented using the existing 2).
+\end{enumerate}
+\subsubsection{Convert}
+\begin{enumerate}
+    \item \textbf{Long Word - Double} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_inhouse_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_1.png}
+    \end{figure}
+    \item \textbf{Double - Long Word} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_inhouse_2.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_2.png}
+    \end{figure}
+    \item \textbf{Double - Long Word} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_inhouse_3.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_3.png}
+    \end{figure}
+    There are a couple of things to note here. Converting a \textbf{NaN}, or \textbf{infinity} to a double will return either the largest positive or negative number (depending on sign). This is done as-per \textbf{IEEE-754} convention.
+    \item \textbf{Word-Single} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_inhouse_4.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_4.png}
+    \end{figure}
+    \item \textbf{Single-Double} \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_5.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_5.png}
+    \end{figure}
+    \begin{table}[h]
+        \centering
+        \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{No.} & \textbf{Expected} & \textbf{Converted} \\
+        \hline
+        1 & 0x42f70000 (123.5) & 0x42f70000 (123.5) \\
+        \hline
+        2 & 0x40490fcb (3.14159) & 0x40490fc7 (3.14158) \\
+        \hline
+        3 & 0x421c0000 & 0x421bffff (38.999996) \\
+        \hline
+        4 & 0xc13cb852 (-11.795) & 0xc13cb851 (-11.794999) \\
+        \hline
+        5 &0xc2240000(-41) & 0xc2240000 (-41) \\
+        \hline
+        \end{tabular}
+        \end{table}
+    We observe a slight difference when converting from double to single. This is due to precision loss when truncating mantissa. There have been checks to convert larger floating point numbers to infinity and some denormal numbers to 0.
+
+    It has been decided to add only the above 6 conversion operations. Thus the conversion of long-double, word-single, single-double has been verified.
+\end{enumerate}
+
+\chapter{Branching}
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_abhimanyu/branch_test.png}
+    \end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{report/figs_abhimanyu/branch_mem.png}
+\end{figure}
+
+These results show that the branch instructions are working properly without any bugs.
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_abhimanyu/jump_test.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{report/figs_abhimanyu/jump_mem.png}
+\end{figure}
+
+These results show that the \texttt{jump} instruction is working properly without any bugs.
+
+\chapter{U-format}
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_abhimanyu/U_jalr_test.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{report/figs_abhimanyu/U_jalr_mem.png}
+\end{figure}
+
+These results show that the U-format instructions and \texttt{jalr} are working properly without any bugs.
+
+\chapter{Memory}
+\section{Storing}
+The following store operations are supported,
+\begin{enumerate}
+    \item \textbf{Store Double-Word}, stores 64-bit register in memory
+    \item \textbf{Store Word}, stores 32-bits (first 32-bits starting from LSB from the 64=bit register)
+    \item \textbf{Store Half-Word}, stores 16-bits (first 16-bits starting from LSB from the 64-bit register)
+    \item \textbf{Store Byte}, stores 8-bits (1-byte) (first 8-bits starting from LSB from the 64-bit register)
+\end{enumerate}
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/store_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_5.png}
+    \end{figure}
+We observe and verify the storing of register values in memory.
+\chapter{Hazards}
+\section{Data Hazards}
+\subsection{EX-Hazard}
+There are two data hazards in this test-case,
+\begin{enumerate}
+    \item \textbf{Line 2.} register \textbf{x1}'s updated value is required.
+    \item \textbf{Line 4.} register \textbf{x2}'s updated value is required
+\end{enumerate}
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/data_hazard_1.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_5.png}
+    \end{figure}
+\subsection{MEM-Hazard}
+There are two data hazards in this test-case,
+\begin{enumerate}
+    \item \textbf{Line 4.} register \textbf{x2}'s updated value is required (so that the correct value is stored in memory).
+    \item \textbf{Line 8.} register \textbf{x4}'s updated value is required. So pipeline has to be stalled for one cycle to store updated value in \textbf{x4}.
+\end{enumerate}
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/data_hazard_2.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_5.png}
+    \end{figure}
+\subsection{EX-Hazard Edge Case}
+This is a slightly interesting case. This is because there are multiple conflicting hazards in each cycle. In the third and fourth \textbf{addi} instruction, there can be 2 sources of forwarding - \textbf{EX-MEM-register} and \textbf{MEM-WB-register}. This must be appropriately handled. Result of \textbf{MEM-stage} is only used if there can be no forwarding from the result of \textbf{EX-stage}.
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/data_hazard_3.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_5.png}
+    \end{figure}
+\subsection{EX-vs-MEM-Hazard}
+There are three data hazards in this test-case,
+\begin{enumerate}
+    \item \textbf{Line 5.} register \textbf{x3}'s updated value is required (so that the correct value is stored in memory).
+    \item \textbf{Line 8.} register \textbf{x5}'s updated value is required. So pipeline has to be stalled for one cycle to store updated value in \textbf{x5}.
+    \item \textbf{Line 9. } forwarding has to occur for register \textbf{x6, x5} (due to \textbf{EX-MEM-stage}, \textbf{MEM-WB-stage} respectively).
+\end{enumerate}
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/data_hazard_4.png}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_arjun/fcvt_sim_5.png}
+    \end{figure}
+\section{Control Hazards}
+
+\end{document}

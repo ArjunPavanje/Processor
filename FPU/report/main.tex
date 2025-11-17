@@ -1,0 +1,637 @@
+\documentclass[12pt,a4paper]{article}
+% Packages for enhanced functionality
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx} % For including images
+\usepackage{geometry} % For page layout
+\usepackage{hyperref} % For clickable links and references
+\usepackage{fancyhdr} % For custom headers and footers
+\usepackage{float} 
+\usepackage{circuitikz}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usepackage{circuitikz}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+\newcommand{\vecb}[1]{\mathbf{#1}}
+\newcommand{\brak}[1]{\ensuremath{\left(#1\right)}}
+\newcommand{\cbrak}[1]{\ensuremath{\left\{#1\right\}}}
+\newcommand{\abs}[1]{\left\vert#1\right\vert}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\providecommand{\sbrak}[1]{\ensuremath{{}\left[#1\right]}}
+\providecommand{\lsbrak}[1]{\ensuremath{{}\left[#1\right.}}
+\providecommand{\rsbrak}[1]{\ensuremath{{}\left.#1\right]}}
+\providecommand{\brak}[1]{\ensuremath{\left(#1\right)}}
+\providecommand{\lbrak}[1]{\ensuremath{\left(#1\right.}}
+\providecommand{\rbrak}[1]{\ensuremath{\left.#1\right)}}
+\providecommand{\cbrak}[1]{\ensuremath{\left\{#1\right\}}}
+\providecommand{\lcbrak}[1]{\ensuremath{\left\{#1\right.}}
+\providecommand{\rcbrak}[1]{\ensuremath{\left.#1\right\}}}
+\hypersetup{
+    colorlinks=true,  % Enable colored text links
+    linkcolor=orange,    % Internal links (sections, table of contents, etc.)
+    urlcolor=orange,     % External URLs
+    citecolor=orange,    % Citations
+    pdfborder={0 0 0} % Remove ugly default borders
+}
+
+
+\title{\textbf{Processor}}
+\author{EE24BTECH11002 : Agamjot Singh
+\\EE24BTECH11005 : Arjun Pavanje
+\\EE24BTECH11024 : Abhimanyu Koushik}
+
+\begin{document}
+\maketitle
+\vspace{30pt}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width = 100pt]{logo.png}\\
+\end{figure}
+\begin{center}
+	Bachelor of Technology\\
+	\vspace{10pt}
+	Department of Electrical Engineering\\
+\end{center}
+\newpage
+
+
+\pagebreak
+\section*{FPU}
+Floating point operations supported so far are,
+\begin{itemize}
+    \item Addition
+    \item Subtraction
+    \item Multiplication
+    \item Division
+    \item Square Root
+    \item Floating Point Conversion (double to long and vice-versa)
+\end{itemize}
+\subsection*{FPU Control Unit}
+\begin{enumerate}
+    \item \textbf{fadd}
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+          \hline
+          funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+          \hline
+          00000 & 01 &  &  &  &  & 1010011 \\
+          \hline
+        \end{tabular}
+    \end{table}
+    \item \textbf{fsub}
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+          \hline
+          funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+          \hline
+          00001 & 01 &  &  &  &  & 1010011 \\
+          \hline
+        \end{tabular}
+    \end{table}
+    \item \textbf{fmul}
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+          \hline
+          funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+          \hline
+          00010 & 01 & & & & & 1010011 \\
+          \hline
+        \end{tabular}
+    \end{table}
+    \item \textbf{fdiv}
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+          \hline
+          funct5 & fmt & rs2 & rs1 & rm & rd & opcode \\
+          \hline
+          00011 & 01 & & & & & 1010011 \\
+          \hline
+        \end{tabular}
+    \end{table}
+    \pagebreak
+    \item \textbf{fsqrt}
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+          \hline
+          funct5 & fmt & 00000 & rs1 & rm & rd & opcode \\
+          \hline
+          01011 & 01 & 00000 & & & & 1010011 \\
+          \hline
+        \end{tabular}
+    \end{table}
+    \item \textbf{fcvt.l.d}
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+          \hline
+          funct5 & fmt &  & rs1 & rm & rd & opcode \\
+          \hline
+           11000 & 01 & 00010 & & & & 1010011 \\
+          \hline
+        \end{tabular}
+    \end{table}
+    \item \textbf{fcvt.l.d}
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+          \hline
+          funct5 & fmt &  & rs1 & rm & rd & opcode \\
+          \hline
+           11010 & 01 & 00010 & & & & 1010011 \\
+          \hline
+        \end{tabular}
+    \end{table}
+    \newline Taking 32-bit instruction as input, 3-bit FPU opcode is calculated using a case statement and comparing \textbf{funct5}, \textbf{fmt}, \textbf{opcode}.
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|}
+          \hline
+          \textbf{Floating Point Instruction} & \textbf{FPU Opcode} \\
+          \hline
+          fadd.d       & 000 \\
+          \hline
+          fsub.d       & 001 \\
+          \hline
+          fmul.d       & 010 \\
+          \hline
+          fdiv.d       & 011 \\
+          \hline
+          fsqrt.d      & 100 \\
+          \hline
+          fcvt.l.d     & 101 \\
+          \hline
+          fcvt.d.l     & 110 \\
+          \hline
+        \end{tabular}
+    \end{table}
+    \newline Then corresponding to FPU Opcode, appropriate operation is performed. 
+\end{enumerate}
+\pagebreak
+\subsection*{Adder/Subtractor}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figs/fpadder.png}
+\end{figure}
+The following procedure was  (for illustrative purposes we consider 2.5 (\textbf{0x4004000000000000}) + 1.5 (\textbf{0x3ff8000000000000})
+\begin{enumerate}
+    \item \textbf{Exponent}
+    \begin{enumerate}
+        \item Exponent is the initially that of the larger number (In this case, it is that of 2.5 (\textbf{10000000000})).
+        \item It is later accordingly updated when calculating Mantissa.
+    \end{enumerate}
+    \item \textbf{Mantissa}
+    \begin{enumerate}
+        \item Shift the smaller (In this case, shift $1.5$ right by $\mathbf{10000000000} - \mathbf{01111111111}$ i.e. by 1)
+        \item Either Add or Subtract (based on Sign bits) (In this case, as both 1.5, 2.5 are of same sign we add, we obtain $\mathbf{10.110}$).
+        \item Normalize the Sum/Difference obtained (Shift sum left by 1, increment exponent by 1. Normalized Mantissa: $\mathbf{1.0110}$, Exponent: $\mathbf{10000000001}$ )
+        \item Round, then renormalize the output of normalizing unit (No need to round here)
+        \item Update exponent alongside normalizing, round
+    \end{enumerate}
+    \item \textbf{Sign}
+    \begin{enumerate}
+        \item Calculate \textbf{cntrl} bit which specifies the larger number
+        \item Output sign can be calculated combinationally as, 
+        \begin{verbatim}
+        (~(S_A ^ S_B) & (S_A & S_B)) | 
+        ((S_A ^ S_B) & (((~cntrl) & S_A) | (cntrl & S_B)));
+        \end{verbatim}
+        In this case, output sign bit is 0.
+    \end{enumerate}
+    Finally, we get output as,
+    \begin{table}[h]
+            \centering
+            \begin{tabular}{|c|c|c|}
+                \hline 
+                \textbf{Sign Bit} & \textbf{Exponent} & \textbf{Mantissa} \\
+                \hline
+                 0 &  10000000001 & 011000... \\
+                \hline
+            \end{tabular}
+        \end{table}
+    \newline Which comes out to be, $\mathbf{0x4010000000000000} = 4$
+    \textbf{Handling Infinites, NaNs: }
+    \begin{itemize}
+        \item If exactly one operand is infinity, output is infinity of the corresponding sign.
+        \item If both operands are infinities of the same sign, output is the same
+        \item If both operands are infinities of opposite signs, \textbf{NaN} is returned.
+        \item Exponent overflow is handled by setting the sum to infinity, exponent underflow is handled by setting the sum to zero.
+    \end{itemize}
+    Subtraction is handled by negating \textbf{rs2} operand and then passing operands to adder.
+\end{enumerate}
+\begin{itemize}
+    \item \textbf{Normalizing Logic: } In case subtraction ($1.M_X - 1.M_Y$) is performed, we can't directly determine location of the leading 1. So we scan for leading 1 (starting from MSB to LSB) and right shift the difference. In case of addition ($1.M_X + 1.M_Y$), we get 2 cases, (leading 1 is in bit 53 or is in the carry  i.e. $1.XXX\dots$ or $1X.XXX\dots$ (in which case we left shift)).
+    \item \textbf{Rounding: } RTNE (Round to nearest even) was implemented. There are issues in the rounding block as of now, it will be fixed soon.
+\end{itemize}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{FPU/report/figs/fpadder_tb.png}
+\end{figure}
+As mentioned above and observed in the test-bench, issues only arise due to rounding, it will be fixed soon.
+\pagebreak
+\subsection*{Multiplier}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FPU/report/figs/fpmul.png}
+\end{figure}
+The following procedure was  (for illustrative purposes we consider  1.5 (\textbf{0x3ff8000000000000}) * 5.0 (\textbf{0x4014000000000000})
+\begin{enumerate}
+    \item \textbf{Exponent}
+    \begin{enumerate}
+        \item Add both exponents and subtract bias (1023)(In this case, $\mathbf{10000000001} + \mathbf{01111111111} - \mathbf{1111111111}$).
+        \item It is later accordingly updated when calculating Mantissa.
+    \end{enumerate}
+    \item \textbf{Mantissa}
+    \begin{enumerate}
+        \item Multiply the 2 mantissas (In this case $\mathbf{1.010000} * \mathbf{1.100000} = 11.110...0$)
+        \item Normalize the product (In the example, shift product left by 1, increment exponent by 1. Normalized Mantissa: $\mathbf{1.111}$, Exponent: $\mathbf{10000000001}$ )
+        \item Round, then renormalize the output of normalizing unit (No need to round here)
+        \item Update exponent alongside normalizing, round
+    \end{enumerate}
+    \item \textbf{Sign}
+    \begin{enumerate}
+        \item Output sign can be calculated combinationally as by XOR'ing the sign bits of the 2 numbers, 
+        \begin{verbatim}
+        S_A ^ S_B
+        \end{verbatim}
+        In this example, output sign bit is 0.
+    \end{enumerate}
+    Finally, we get output as,
+    \begin{table}[h]
+            \centering
+            \begin{tabular}{|c|c|c|}
+                \hline 
+                \textbf{Sign Bit} & \textbf{Exponent} & \textbf{Mantissa} \\
+                \hline
+                 0 &  10000000001 & 11100... \\
+                \hline
+            \end{tabular}
+        \end{table}
+    \newline Which comes out to be, $\mathbf{0x401e000000000000} = 7.5$
+    \newline \textbf{Handling Infinites, NaNs: }
+    \begin{itemize}
+        \item If exactly one operand is infinity, output is infinity of the corresponding sign.
+        \item If both operands are infinities of the same sign, output is the same
+        \item If both operands are infinities of opposite signs, $-\infty$ is returned.
+        \item Exponent overflow is handled by setting the product to infinity, exponent underflow is handled by setting the product to zero.
+        \item $0 \times \infty$ cases are handled by returning \textbf{NaN}
+    \end{itemize}
+    Subtraction is handled by negating \textbf{rs2} operand and then passing operands to adder.
+\end{enumerate}
+\begin{itemize}
+    \item \textbf{Normalizing Logic: } Unlike addition and division, normalizing is simpler. When we multiply $1.M_X \times 1.M_Y$ output is either of the form $1.XXX\dots$ or $1X.XXX\dots$. In the later case, we need to shift left.
+    \item \textbf{Rounding: } RTNE (Round to nearest even) was implemented. There are issues in the rounding block as of now, it will be fixed soon.
+\end{itemize}
+\pagebreak
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FPU/report/figs/fpmul_tb.png}
+\end{figure}
+As mentioned above and observed in the test-bench, issues only arise due to rounding, it will be fixed soon.
+
+\pagebreak
+\subsection*{Divider}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FPU/report/figs/fpmul.png}
+\end{figure}
+The following procedure was  (for illustrative purposes we consider  1.5 (\textbf{0x3ff8000000000000}) / 5.0 (\textbf{0x4014000000000000} )
+\begin{enumerate}
+    \item \textbf{Exponent}
+    \begin{enumerate}
+        \item Subtract both exponents and add bias (1023)(In this case, $\mathbf{10000000001} - \mathbf{01111111111} + \mathbf{1111111111}$).
+        \item It is later accordingly updated when calculating Mantissa.
+    \end{enumerate}
+    \item \textbf{Mantissa}
+    \begin{enumerate}
+        \item Multiply the 2 mantissas (In this case $\mathbf{1.100000} / \mathbf{1.0100000} = 000\dots010011001100110011001100110011001100110011001100110011$)
+        \item Normalize the product (In the example, shift product left by 1, increment exponent by 1. \newline Normalized Mantissa: $\mathbf{1.0011001100110011001100110011001100110011001100110011}$, \newline Exponent: $\mathbf{01111111101}$ )
+        \item Round, then renormalize the output of normalizing unit (No need to round here)
+        \item Update exponent alongside normalizing, round
+    \end{enumerate}
+    \item \textbf{Sign}
+    \begin{enumerate}
+        \item Output sign can be calculated combinationally as by XOR'ing the sign bits of the 2 numbers, 
+        \begin{verbatim}
+        S_A ^ S_B
+        \end{verbatim}
+        In this example, output sign bit is 0.
+    \end{enumerate}
+    Finally, we get output as,
+    \begin{table}[h]
+            \centering
+            \begin{tabular}{|c|c|c|}
+                \hline 
+                \textbf{Sign Bit} & \textbf{Exponent} & \textbf{Mantissa} \\
+                \hline
+                 0 &  01111111101 & 0011001100110011001100110011001100110011001100110011 \\
+                \hline
+            \end{tabular}
+        \end{table}
+    \newline Which comes out to be, $\mathbf{0x3fd3333333333333} = 0.3$
+    \newline \textbf{Handling Infinites, NaNs: }
+    \begin{itemize}
+        \item If exactly one operand is infinity, output is infinity of the corresponding sign.
+        \item If both operands are infinities of the same sign, output is the same
+        \item If both operands are infinities of opposite signs, $-\infty$ is returned.
+        \item Exponent overflow is handled by setting the product to infinity, exponent underflow is handled by setting the product to zero.
+        \item $0 \times \infty$ cases are handled by returning \textbf{NaN}
+    \end{itemize}
+    Subtraction is handled by negating \textbf{rs2} operand and then passing operands to adder.
+\end{enumerate}
+\begin{itemize}
+    \item \textbf{Normalizing Logic: } Unlike addition and division, normalizing is simpler. When we multiply $1.M_X \times 1.M_Y$ output is either of the form $1.XXX\dots$ or $1X.XXX\dots$. In the later case, we need to shift left.
+    \item \textbf{Rounding: } RTNE (Round to nearest even) was implemented. There are issues in the rounding block as of now, it will be fixed soon.
+\end{itemize}
+\pagebreak
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FPU/report/figs/fpmul_tb.png}
+\end{figure}
+As mentioned above and observed in the test-bench, issues only arise due to rounding, it will be fixed soon.
+\pagebreak
+\subsection*{Square Root}
+There are quite a few ways to calculate square root of a floating point number. One way is \textbf{digit-by-digit} method. The below shows example usage of that method,
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.4\textwidth]{FPU/report/figs/dig.png}
+\end{figure}
+\newline However, this method is hardware heavy and involves multiple arithmetic operations. So we decided to do something different. 
+\subsubsection*{Quake 3}
+Quake 3 algorithm, also known as Fast Inverse Square Root algorithm is an algorithm to calculate the inverse square root of a number $i.e. x \rightarrow \dfrac{1}{\sqrt{x}}$. So we first perform $\dfrac{1}{x}$ and then take its inverse square root. This method trades accuracy for hardware efficiency. \newline
+This is the original quake 3 algorithm first discovered in the game "Quake 3 Arena". 
+\begin{verbatim}
+float Q_rsqrt( float number )
+{
+	long i;
+	float x2, y;
+	const float threehalfs = 1.5F;
+
+	x2 = number * 0.5F;
+	y  = number;
+	i  = * ( long * ) &y;                       // evil floating point bit level hacking
+	i  = 0x5f3759df - ( i >> 1 );               // what the f***?
+	y  = * ( float * ) &i;
+	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+
+	return y;
+}
+\end{verbatim}
+While an entire section can be added on the working principle of the algorithm, the use of magic numbers, approximations involved, etc but it as it isn't really pertinent to the overall project, so just the algorithm (taken as is from wikipedia) has been listed. While there is some error due to the approximations involved in this approach, but the overall error is much lesser than $1\%$. An additional iteration of Newton-Ralphson has been performed for the sake of improving accuracy. \newline \newline
+\textbf{Handling Infinites, NaNs: }
+    \begin{itemize}
+        \item If operand is infinity, infinity is returned.
+        \item Underflow cases have been handled by returning 0
+        \item Negative number cases are handled by returning \textbf{NaN}
+    \end{itemize}
+    Subtraction is handled by negating \textbf{rs2} operand and then passing operands to adder.
+\pagebreak
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{FPU/report/figs/fsqrt_tb.png}
+\end{figure}
+We can observe the accuracy tradeoff in the outputs. In the test bench, a tolerance of $0.1\%$ has been set.
+\pagebreak
+\subsection*{FCVT}
+\subsubsection*{FCVT.l.d}
+We recieve a floating point register as input and have to convert its double contents into integer (i.e. if we get say $0x4048800000000000$ (translates to 49.0 in double) as input, output general purpose point register should have $49 = 00\dots110001$). The procedure followed was (consider the example $121/7 = 17.2857142857 = \mathbf{0x40314924924914dd}$,
+\begin{itemize}
+    \item We know the number is of form $(\mathbf{S})1.(\mathbf{M})\times 2^{\mathbf{1023-E}}$
+    \item So we shift mantissa (1.Mantissa) required number of times. If there are still digits on the right of the decimal point, we have chosen to truncate it as a design choice. (On shifting we get,\newline  $\mathbf{10001.010010010010010010010010010010010001010011011101}$ \newline and after truncation $\mathbf{(10001)_2=17}$ 
+    \item Then based on sign bit we either take 2's complement or don't.
+    \item If input is $\pm \infty$, output in general purpose register will be the maximum representable positive or negative number respectively \newline $(\mathbf{0x800 0000 0000 0000} \text{ or } \mathbf{0x7FFF FFFF FFFF FFFF})$. For now, NaN inputs are returned as 0's but in the future we plan to add an exception for any NaN input.
+\end{itemize}
+\subsubsection*{FCVT.d.l}
+We recieve a general purpose register as input and have to convert its integer contents into floating point (i.e. if we get say $49$ as input, output floating point register should have $0x4048800000000000$ (translates to 49.0)). The procedure followed was (consider the example of $49 = 000110001$,
+\begin{itemize}
+    \item Find the leading 1 (done by using a lot of MUXs as every bit from MSB to LSB must be scanned)(In the chosen example, MSB is at index 5).
+    \item Consider everything on the right of the leading 1 to be part of mantissa (pad with zeros if length is insufficient)(In the example, Mantissa would be $\mathbf{1.100010000\cdots}$).
+    \item Position of leading 1 gives us exponent (In the example, exponent would be $5$ (index of leading 1) $+1023 = 1028 = \mathbf{10000000100}$
+    \item Sign can be found pretty easily (if negative, we chose to work with its 2's complement)
+    Hence we get the final result $\mathbf{0 10000000100 100010000\cdots} = 0x4048800000000000$.
+\end{itemize}
+\pagebreak
+\subsubsection*{Testbench}
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=1.2\textwidth]{FPU/report/figs/fcvtld.png}
+        \caption{fcvt.l.d test bench}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=1.2\textwidth]{FPU/report/figs/fcvtdl.png}
+        \caption{fcvt.d.l testbench}
+    \end{subfigure}
+\end{figure}
+\pagebreak
+\subsection*{Issues Faced}
+\begin{itemize}
+    \item There were no exact circuit diagrams for floating point multipliers, adders, dividers, etc so they had to be designed from scratch. Doing so led to some issues.
+    \item One instance was, during the design of floating point adder. Incorrect output appeared repeatedly due to the fact that leading 1 was not scanned properly in the normalizing unit. Generally, if signs of both numbers are same and addition has to happen in the \textbf{Add/Subtract} block, it would be of the form $\mathbf{1.M_1+1.M_2}$ which would at max be of the form $\mathbf{11.XXX}$ and we would only have to left shift once at max. However, when we subtract, result can  be lesser than $1$ as well, hence we have to scan every bit from MSB to LSB to find trailing 1. So designing the normalizing units appropriately for each operation was a little bit of a challenge.
+    \item Implementing rounding was a little bit of a challenge as well, as my initial approach was using k-maps which can quite easily go wrong. 
+    \item Calculating square root using digit-by-digit method would be more hardware intensive and would take up more LUTs, hence there had to be thorough research on other methods and tradeoffs between accuracy and hardware effeciency before finally deciding on using fast inverse square root algorithm.
+\end{itemize}
+\subsection*{Future Scope}
+\begin{itemize}
+    \item Currently, RTNE (round to nearest even) mode of rounding is used which currently isn't working. Method attempted was constructing a table of LSB, Round, Guard, Sticky bits and whether or not to add 1 and then use karnaugh-maps. So instead of solving using kmaps, we can use case statements instead as there is lesser chance of error. Also support for other rounding modes (like Round Down, Round Up, ROunt to Zero, etc) can be added.
+    \item Currently, only double type operations are supported (not float). So current functions will later be mmodified to support floating point instructions (32-bit) as well.
+    \item Currently only 7 instructions are supported,
+    \begin{enumerate}
+        \item fadd.d
+        \item fsub.d
+        \item fmul.d
+        \item fdiv.d
+        \item fsqrt.d
+        \item fcvt.l.d
+        \item fcvt.d.l
+    \end{enumerate}
+    Other floating point operations such as \textbf{feq, flt, fgt, fmadd, fsgnj}, etc can be added.
+    \item This is something which most definitely will not be done in the final version of the project but is something that would be fun to work on later. Each floating point component (fmul, fadd, etc) can be pipelined and made sequential to a clock of smaller period than internal clock. While this would require additional things like a synchronizer, it would lead to speed up in FPU.
+    \item When fdiv is called, the divider from ALU (which would otherwise be sitting idle) will be called to save LUTs. This should bring down LUT usage by about $10\%$
+\end{itemize}
+
+\pagebreak
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{figs/ALU_FPUblock.png}
+    \caption{ALU-FPU block as a whole}
+    \label{fig:placeholder}
+\end{figure}
+
+\section{Datapath Verilog Implementation}
+\subsection{ALU}
+First things first, we start with the \textbf{ALU}. As mentioned above we started with implementing a \textit{Fast Parallel Multiplier} and our own custom built modules for \textit{addsub}, \textit{shift} etc. The verilog testbenches worked as expected.\\
+
+\textbf{\textit{The First ROADBLOCK}} The problem arose when we started to synthesize it! The fast multipler itself took away \textbf{$\approx$ 11.8 \% LUTs} $\approx 6200$ LUTs which is insane. We obviously cannot afford that kind of LUT usage.\\
+
+What's the solution? \textbf{DSP}s are the obvious solution. Using DSPs and just using $a * b$ in our verilog code synthesized to only about $\approx 200$ LUTs which is much better. This similar thing is carried over to \textit{shift}, \textit{addsub}, \textit{mul}, \textit{div} blocks along with some small ALU blocks here and there.\\
+
+\textit{Note:} Flags \textit{zero}, \textit{neg}, \textit{negu} are given always no matter what instruction. This is used from branch instructions.
+
+\subsection{Immediate generator}
+Immediate generator is pretty straightforward, you just use a \textit{case} statement to filter out the desired immediate from the extended opcode.
+
+\subsection{Register file}
+Register file, as explained above is a 64x64 Flop array. The reason the depth is 64 is to support FPU registers in one fused register file with first 32 registers being x0 to x31 and the next 32 registers being f0 to f31. x0 is pulled down to 0 always.\\
+
+\textit{Note:} The registers used in the register file do not use the BRAM. \textbf{LUT}s as memory are being used for faster access times and easier to handle debugging and development.
+
+\subsection{Control}
+Control is just a biggg case statement with all the flags being specified from the opcode. All the flags are given in the datapath diagram. \textit{Note:} All the sub control blocks, like branch control, alu control etc. are seperate from the control block.
+
+\subsection{Instruction Memory}
+\textbf{\textit{Another ROADBLOCK}} is that this memory (BRAM) takes 2 cycles to read. This requires the need for STALLS as explained in the next section. Instruction memory is a \textbf{32 bit wide word addressable} memory (TODO: Make it byte addressable for continuity). This is because one read will take 2 cycles for a 8 bit wide BRAM as well as a 32 bit wide BRAM. So the total cycles if we were to implement four 8 bit wide memories is that it would take 8 cycles latency! This can be further improved by making a parallelized memory (interleaved) to make it universally byte addressable.
+
+\subsection{PC FSM}
+\textit{STALLS} are necessary because the memory takes (2 or best case 1 cycle latency) to even read. This requires the \textit{PC} to \textbf{not be updated} in a fashion $100100100 \dots$ (for 2 cycle stall) at each clock edge. This means a simple FSM counter would work.
+
+\subsection{Data Memory}
+\textbf{\textit{Another BIG ROADBLOCK}} is that for supporting data memory, we cannot just take the easy route and make it a 64-bit wide memory. This removes the support for instructions like \textit{sb}, \textit{sh} and \textit{sw} which will require granularity in memory write. We also cannot afford 16 cycles (2 for each 8 BRAM blocks).\\
+
+This brings us to the parallelized BRAM design, which has already been explained above in the design section. Implementing that is extremely tricky as there can rollovers in the matrix-like design and we would have to implement a good "memory bank" design. This is a \textit{work in progress} and it'll be implemented down the line. This means no support for load-store instructions as of now.
+
+\subsection{PUTTING IT ALL TOGETHER!}
+Honestly, putting it all together was a mess. One-by-one each block was added and tested. After the entire datapath, the FPU is added. The FPU integration (although support is there) is still a work in progress and requires code optimization. This doesn't mean that the FPU or FPU instruction support is not there. The FPU itself is totally functional.
+
+\section{Vivado Simulation}
+Unfortunately uploading on the FPGA has not been done yet. FPGA upload will take some time because of the PYNQ-Z2 board setup for the AXI interface between PS and PL blocks of the Zynq chip.
+
+\subsection{Instruction memory}
+Instruction memory is an \textbf{IP} (Intellectual Property) which is configurable at runtime. It is configured as shown before. The instruction memory is preloaded with a \textbf{.coe} file with data (which is being used to test right now)
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{./figaa/instrmem.png}
+\end{figure}
+
+\subsection{Synthesis}
+
+LUT consumption usage is given below. The LUT usage is EXTREMELY high but this will highly be optimized in the next phase.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{./figaa/lut.png}
+\end{figure}
+
+DSP usage also is extremely high, but it is also gonna be extremely optimized in the next section.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{./figaa/dsp.png}
+\end{figure}
+
+\subsection{Utilization}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.2\linewidth]{./figaa/consum.png}
+\end{figure}
+
+\subsection{Synthesis Elaborated Designs}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.2\linewidth]{./figaa/synth.png}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{./figaa/synthexact.jpeg}
+\end{figure}
+
+\section{Testing in simulation - Sample programs}
+Lets run some sample programs, note that load-store instructions are not part of the parcel as of now.
+
+\textit{NOTE:} This instance uses 5 clock cycles total (4 cycle stall) to execute each instruction. This is because of the half baked implementation for the data memory part.
+
+\subsection*{Program \#1}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{./figaa/sp1.png}
+    \caption{Expected output and code}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.25\linewidth]{./figaa/sp1out.png}
+    \caption{Wave output}
+\end{figure}
+
+\subsection*{Program \#2}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{./figaa/sp2.png}
+    \caption{Expected output and code}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.25\linewidth]{./figaa/sp2out.png}
+    \caption{Wave output}
+\end{figure}
+
+\subsection*{Program \#3}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{./figaa/sp3.png}
+    \caption{Expected output and code}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.25\linewidth]{./figaa/sp3out.png}
+    \caption{Wave output}
+\end{figure}
+
+\subsection*{Program \#4}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{./figaa/sp6.png}
+    \caption{Expected output and code}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.25\linewidth]{./figaa/sp6out.png}
+    \caption{Wave output}
+\end{figure}
+
+\subsection*{Program \#5 - FPU}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{./figaa/fp.png}
+    \caption{Expected output and code}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.25\linewidth]{./figaa/fpout.png}
+    \caption{Wave output}
+\end{figure}
+
+\section{Codes}
+The entire verilog code can be found at,
+\url{https://github.com/agamjotsingh1/processor}.
+
+
+\section*{Bibliography}
+List of websites used, \newline
+\url{https://gregstoll.com/~gregstoll/floattohex/} \newline 
+\url{https://en.wikipedia.org/wiki/Fast_inverse_square_root} \newline 
+\url{https://www.cs.sfu.ca/~ashriram/Courses/CS295/assets/notebooks/RISCV/RISCV_CARD.pdf} \newline 
+\url{https://msyksphinz-self.github.io/riscv-isadoc/#_fmadd_d}\newline 
+\url{https://www.perplexity.ai/} has been used for generating test benches, test bench has been modified, test cases have been changed as and when needed. Also in normalizing unit, there were cases where multiple MUXs (like around 52 (even 127 in one case)) had to be used to check for leading 1. It was used in the generation of the nested ternary operators.
+\end{document}
