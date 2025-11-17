@@ -765,7 +765,7 @@ Floating-point operations supported by the current FPU are,
 \subsection*{Adder/Subtractor}
 \begin{figure}[ht!]
     \centering
-    \includegraphics[width=0.8\textwidth]{figs/fpadder.png}
+    \includegraphics[width=0.8\textwidth]{FPU/report/figs/fpadder.png}
 \end{figure}
 The following procedure was  (for illustrative purposes we consider 2.5 (\textbf{0x4004000000000000}) + 1.5 (\textbf{0x3ff8000000000000})
 \begin{enumerate}
@@ -1022,30 +1022,13 @@ We recieve a general purpose register as input and have to convert its integer c
     \end{subfigure}
 \end{figure}
 \pagebreak
+\subsubsection{}
 \subsection*{Issues Faced}
 \begin{itemize}
     \item There were no exact circuit diagrams for floating point multipliers, adders, dividers, etc so they had to be designed from scratch. Doing so led to some issues.
     \item One instance was, during the design of floating point adder. Incorrect output appeared repeatedly due to the fact that leading 1 was not scanned properly in the normalizing unit. Generally, if signs of both numbers are same and addition has to happen in the \textbf{Add/Subtract} block, it would be of the form $\mathbf{1.M_1+1.M_2}$ which would at max be of the form $\mathbf{11.XXX}$ and we would only have to left shift once at max. However, when we subtract, result can  be lesser than $1$ as well, hence we have to scan every bit from MSB to LSB to find trailing 1. So designing the normalizing units appropriately for each operation was a little bit of a challenge.
     \item Implementing rounding was a little bit of a challenge as well, as my initial approach was using k-maps which can quite easily go wrong. 
     \item Calculating square root using digit-by-digit method would be more hardware intensive and would take up more LUTs, hence there had to be thorough research on other methods and tradeoffs between accuracy and hardware effeciency before finally deciding on using fast inverse square root algorithm.
-\end{itemize}
-\subsection*{Future Scope}
-\begin{itemize}
-    \item Currently, RTNE (round to nearest even) mode of rounding is used which currently isn't working. Method attempted was constructing a table of LSB, Round, Guard, Sticky bits and whether or not to add 1 and then use karnaugh-maps. So instead of solving using kmaps, we can use case statements instead as there is lesser chance of error. Also support for other rounding modes (like Round Down, Round Up, ROunt to Zero, etc) can be added.
-    \item Currently, only double type operations are supported (not float). So current functions will later be mmodified to support floating point instructions (32-bit) as well.
-    \item Currently only 7 instructions are supported,
-    \begin{enumerate}
-        \item fadd.d
-        \item fsub.d
-        \item fmul.d
-        \item fdiv.d
-        \item fsqrt.d
-        \item fcvt.l.d
-        \item fcvt.d.l
-    \end{enumerate}
-    Other floating point operations such as \textbf{feq, flt, fgt, fmadd, fsgnj}, etc can be added.
-    \item This is something which most definitely will not be done in the final version of the project but is something that would be fun to work on later. Each floating point component (fmul, fadd, etc) can be pipelined and made sequential to a clock of smaller period than internal clock. While this would require additional things like a synchronizer, it would lead to speed up in FPU.
-    \item When fdiv is called, the divider from ALU (which would otherwise be sitting idle) will be called to save LUTs. This should bring down LUT usage by about $10\%$
 \end{itemize}
 \chapter{The Datapath}
 \begin{figure}[H]
@@ -1434,7 +1417,7 @@ After selecting appropriate board files in the setup menu, we have to now config
 \end{figure}
 The processing system IP is the main PS of the board itself which will end up controlling the PL through AXI BRAM Controllers.
 
-\textbf{Proposed Architecture for interfacing:} The core has multiple exposed memory pins which will connect with the AXI BRAM controllers. This type of exposing will be done both for instruction and data memory.
+\textbf{Proposed Architecture for interfacing:} The core has multiple exposed memory pins which will connect with the AXI BRAM controllers. This type of exposing will be done both for instruction and data memory. For seeing actual results, 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\linewidth]{report/figs_agam/corebd.png}
@@ -1463,7 +1446,98 @@ Finally, to actually reset/running pins for the processor, and AXI GPIO interfac
 Note that on startup rst = 1 and running = 0.
 
 \section{FPGA booting}
-For booting the PS, debian is flashed onto the sd card, which will run on the PS. Via ethernet the HARDWARE HANDOFF FILES along with the BITSTREAM FILES will be 
+For booting the PS, debian is flashed onto the sd card, which will run on the PS. Via ethernet the HARDWARE HANDOFF FILES along with the BITSTREAM FILES will be uploaded (static computer ip configuration).
+
+Now a simple MICROUsb connection via MINICOM from the pynq board to Laptop is established for running the python script on the PS for uploading instructions, then the core is resetted then started, results are read from the memory in a tabular format.
+
+\begin{verbatim}
+from pynq import Overlay
+from pynq.lib import AxiGPIO
+import time
+
+# Load your overlay
+ol = Overlay("./design_1.bit")
+
+# Instantiating channels and MMIO interfaces
+rst_channel = ol.axi_rst.channel1
+running_channel = ol.axi_running.channel1
+pc_channel = ol.axi_if_pc.channel1
+instr_channel = ol.axi_if_instr.channel1
+data_bram = ol.axi_data_mem_controller
+data_mmio = data_bram.mmio
+instr_bram = ol.axi_instr_mem_controller
+instr_mmio = instr_bram.mmio
+
+# Load specified instructions into instruction memory
+def load_instructions(instr_str, clear_amt=100):
+    for i in range(clear_amt):
+        instr_mmio.array[i] = 0x0
+        
+    for index, line in enumerate(instr_str.strip().split('\n')):
+        instr_mmio.array[index] = int(line.strip(), 16)
+    
+    time.sleep(0.01)
+    
+instructions = """
+<FILL INSTRUCTION HEX CODES (without 0x) LINE AFTER LINE>
+"""
+
+load_instructions(instructions)
+
+# Start the core
+running_channel.write(1, 0xFFFFFFFF)
+
+# Reset the pipeline registers
+rst_channel.write(1, 0xFFFFFFFF)
+time.sleep(0.001)
+rst_channel.write(0, 0xFFFFFFFF)
+time.sleep(0.001)
+
+# Stop the processor
+running_channel.write(0, 0xFFFFFFFF)
+
+MAX_ADDRESS = 50
+COLUMNS = 8
+
+# Tabular memory map (to display memory in a table)
+def print_memory_map(data_mmio):    
+    # Iterate through the data in chunks equal to the column size
+    for start_addr in range(0, MAX_ADDRESS, COLUMNS):
+        
+        addr_parts = []
+        data_parts = []
+        
+        # Collect Address and Data parts for the current row, padding with spaces if needed
+        for offset in range(COLUMNS):
+            addr = start_addr + offset
+            
+            if addr < MAX_ADDRESS:
+                # If address is valid, format the hex string (0x00, 0xAA)
+                addr_parts.append(f"0x{addr:02x}")
+                value = data_mmio.array[addr]
+                data_parts.append(f"0x{value:02x}")
+            else:
+                # If past the end of the data, use 4 spaces for alignment ("0x00" is 4 characters)
+                addr_parts.append("    ")
+                data_parts.append("    ")
+
+        # Print the fully aligned lines
+        print(f"addr: {' '.join(addr_parts)}")
+        print(f"data: {' '.join(data_parts)}")
+        
+        # Print a separator line for readability
+        # Calculates the total length based on 5 characters for 'addr: ' plus 5 chars per column ('0xAA ')
+        print("-" * (5 + COLUMNS * 5)) 
+
+print_memory_map(data_mmio)
+\end{verbatim}
+
+A memory map is printed out for actually reading out the result.
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{report/figs_agam/memorymap.png}
+\end{figure}
+
 
 \part{Testing}
 \chapter{ALU, FPU}
