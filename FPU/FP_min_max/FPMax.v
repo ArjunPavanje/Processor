@@ -74,7 +74,8 @@ module FPMax #(
 
   wire [BUS_WIDTH-1:0] normal_result = (sign_eq) ? ((in1_pos) ? greater_pos : greater_neg) : ((in1_pos) ? in1 : in2);
 
-  assign out = (is_infinity) ? (infinity_res) : ((~is_nan) ? normal_result : NAN);
+  wire [BUS_WIDTH-1:0] NAN_result = (is_nan_A) ? (in2) : (in1);
+  assign out = (is_infinity) ? (infinity_res) : ((~is_nan) ? normal_result : NAN_result);
 
   //wire [BUS_WIDTH-1:0] out_eq = (M_1 > M_2) ? in1 : in2;
   // wire exp_eq = E_1 == E_2;

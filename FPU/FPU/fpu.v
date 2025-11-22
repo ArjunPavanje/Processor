@@ -166,13 +166,13 @@ module FPU #(
       .BUS_WIDTH(BUS_WIDTH)
   ) fp_ld (
       .in1(in1),
-      .out(fcvt_ld)
+      .out(fcvt_l_d)
   );
   FCVT_fp #(
       .BUS_WIDTH(BUS_WIDTH)
   ) fp_dl (
       .in1(in1),
-      .out(fcvt_dl)
+      .out(fcvt_d_l)
   );
   FPAdder #(
       .BUS_WIDTH(32)

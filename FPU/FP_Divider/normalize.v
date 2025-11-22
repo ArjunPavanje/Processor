@@ -173,7 +173,7 @@ module mantissa_normalize #(
   wire R = mantissa_product[BUS_WIDTH-2];
   wire S = |mantissa_product[BUS_WIDTH-3];
 
-  assign round = (left_shift) ? (NO_ROUND) : (G & (R | S)) | (L & G & (~R) & (~S));
+  assign round = (left_shift) ? (NO_ROUND) : (G & (L | R | S)) | (L & G & (~R) & (~S));
   assign mantissa_normalized = (left_shift)?(mantissa_product << shift_amt):(mantissa_product >> shift_amt);
 
 endmodule

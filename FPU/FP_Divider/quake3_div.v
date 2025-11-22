@@ -1,6 +1,6 @@
-`include "/Users/arjunpavanje/Documents/Github/Processor/FPU/FSQRT/newton_ralphson.v"
+//`include "/Users/arjunpavanje/Documents/Github/Processor/FPU/FSQRT/newton_ralphson.v"
 
-module quake3 #(
+module quake3_div #(
     parameter BUS_WIDTH = 64
 ) (
     input  [BUS_WIDTH-1:0] x,
@@ -21,5 +21,5 @@ module quake3 #(
       .y(y_nr_1),
       .y_nr(y_nr_2)
   );
-  assign y = y_1;
+  assign y = y_nr_2;
 endmodule

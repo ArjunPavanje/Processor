@@ -14,22 +14,22 @@ module newton_ralphson (
 
   // y^2
   FPMul quake3_y_sq (
-      .N1 (y),
-      .N2 (y),
+      .in1(y),
+      .in2(y),
       .out(y_sq)
   );
 
   // Y^2/2
   FPMul quake3_mul1 (
-      .N1 (y_sq),
-      .N2 (64'h3fe0000000000000),
+      .in1(y_sq),
+      .in2(64'h3fe0000000000000),
       .out(y_2)
   );
 
   // xy^2/2
   FPMul quake3_mul2 (
-      .N1 (y_2),
-      .N2 (x),
+      .in1(y_2),
+      .in2(x),
       .out(y_3)
   );
 
@@ -43,8 +43,8 @@ module newton_ralphson (
 
   // y*(3/2 - (xy^2/2))
   FPMul quake_mul3 (
-      .N1 (y),
-      .N2 (y_5),
+      .in1(y),
+      .in2(y_5),
       .out(y_nr)
   );
 endmodule

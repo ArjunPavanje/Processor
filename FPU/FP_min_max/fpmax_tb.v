@@ -23,7 +23,9 @@ module FPmax_tb;
   wire sign_eq = dut.sign_eq;
   wire in1_pos = dut.in1_pos;
   wire equal_exp = dut.equal_exp;
+
   // Helper function to compute expected maximum
+  // IEEE 754 fmax behavior: NaN is treated as missing data
   function [BUS_WIDTH-1:0] compute_fmax;
     input [BUS_WIDTH-1:0] a, b;
     real ra, rb;
@@ -31,13 +33,18 @@ module FPmax_tb;
       ra = $bitstoreal(a);
       rb = $bitstoreal(b);
 
-      // Handle NaN cases - return non-NaN value
-      if (a[62:52] == 11'h7FF && a[51:0] != 0)  // a is NaN
+      // Handle NaN cases - return non-NaN value (IEEE 754 fmax semantics)
+      if (a[62:52] == 11'h7FF && a[51:0] != 0) begin
+        // a is NaN, return b (even if b is also NaN)
         compute_fmax = b;
-      else if (b[62:52] == 11'h7FF && b[51:0] != 0)  // b is NaN
+      end else if (b[62:52] == 11'h7FF && b[51:0] != 0) begin
+        // b is NaN (and a is not), return a
         compute_fmax = a;
-      else if (ra > rb) compute_fmax = a;
-      else compute_fmax = b;
+      end else if (ra > rb) begin
+        compute_fmax = a;
+      end else begin
+        compute_fmax = b;
+      end
     end
   endfunction
 
@@ -170,13 +177,17 @@ module FPmax_tb;
     run_test(64'h7FF0000000000000, 64'hFFF0000000000000, compute_fmax(
              64'h7FF0000000000000, 64'hFFF0000000000000), "Infinity: +Inf vs -Inf");
 
-    // Test 36-40: NaN cases
-    run_test(64'h7FF8000000000000, $realtobits(1.0), 64'h7FF8000000000000, "NaN: NaN vs 1.0");
-    run_test($realtobits(1.0), 64'h7FF8000000000000, 64'h7FF8000000000000, "NaN: 1.0 vs NaN");
-    run_test(64'h7FF8000000000000, 64'h7FF0000000000000, 64'h7FF0000000000000, "NaN: NaN vs +Inf");
-    run_test(64'h7FF0000000000000, 64'h7FF8000000000000, 64'h7FF0000000000000, "NaN: +Inf vs NaN");
-    run_test(64'h7FF8000000000000, 64'h7FFFFFFFFFFFFFFF, 64'h7ff8000000000000,
-             "NaN: NaN vs NaN (different)");
+    // Test 36-40: NaN cases - IEEE 754 fmax behavior (return non-NaN value)
+    run_test(64'h7FF8000000000000, $realtobits(1.0), $realtobits(1.0),
+             "NaN: NaN vs 1.0 → return 1.0");
+    run_test($realtobits(1.0), 64'h7FF8000000000000, $realtobits(1.0),
+             "NaN: 1.0 vs NaN → return 1.0");
+    run_test(64'h7FF8000000000000, 64'h7FF0000000000000, 64'h7FF0000000000000,
+             "NaN: NaN vs +Inf → return +Inf");
+    run_test(64'h7FF0000000000000, 64'h7FF8000000000000, 64'h7FF0000000000000,
+             "NaN: +Inf vs NaN → return +Inf");
+    run_test(64'h7FF8000000000000, 64'h7FFFFFFFFFFFFFFF, 64'h7FFFFFFFFFFFFFFF,
+             "NaN: NaN vs NaN → return NaN");
 
     // Test 41-45: Very large/small numbers
     run_test($realtobits(1e308), $realtobits(1e307), compute_fmax(
@@ -220,3 +231,4 @@ module FPmax_tb;
   end
 
 endmodule
+

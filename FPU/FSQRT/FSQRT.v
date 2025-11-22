@@ -1,4 +1,5 @@
 `include "/Users/arjunpavanje/Documents/Github/Processor/FPU/FP_Divider/FPDiv.v"
+`include "/Users/arjunpavanje/Documents/Github/Processor/FPU/FP_Divider/divider_new.v"
 `include "/Users/arjunpavanje/Documents/Github/Processor/FPU/FSQRT/quake3.v"
 
 module FSQRT #(
@@ -20,11 +21,11 @@ module FSQRT #(
 
   wire [BUS_WIDTH-1:0] y_1;
   wire [BUS_WIDTH-1:0] quotient;
-  FPDiv #(
+  FPDiv_Quake3 #(
       .BUS_WIDTH(BUS_WIDTH)
   ) FSQRT_div (
-      .N1 (ONE),
-      .N2 (x),
+      .in1(ONE),
+      .in2(x),
       .out(quotient)
   );
   quake3 FSQRT_quake (

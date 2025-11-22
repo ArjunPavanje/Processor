@@ -325,25 +325,25 @@ module FPAdder_tb;
     // Test 47: 0.7 + (-0.3) = 0.4
     test_A[47] = 64'h3FE6666666666666;
     test_B[47] = 64'hBFD3333333333333;
-    expected[47] = 64'h3FD999999999999A;
+    expected[47] = 64'h3FD999999999999a;
     test_name[47] = "0.7 + (-0.3) = 0.4";
 
     // Test 48: 3.14159 + (-2.71828) = 0.42331
     test_A[48] = 64'h400921FB54442D18;
     test_B[48] = 64'hC005BF0A8B145769;
-    expected[48] = 64'h3FDB11F1A0000000;
+    expected[48] = 64'h3fdb1786497ead78;
     test_name[48] = "3.14159 + (-2.71828) = 0.42331";
 
     // Test 49: 100.001 + (-100) = 0.001
-    test_A[49] = 64'h4059000A7C5AC472;
-    test_B[49] = 64'hC059000000000000;
-    expected[49] = 64'h3F50624DD2F1A9FC;
+    test_A[49] = 64'h40590010624dd2f2;
+    test_B[49] = 64'hc059000000000000;
+    expected[49] = 64'h3f50624dd2f20000;
     test_name[49] = "100.001 + (-100) = 0.001";
 
     // Test 50: 1.0 + (-1e-6) = 0.999999
     test_A[50] = 64'h3FF0000000000000;
     test_B[50] = 64'hBEB0C6F7A0B5ED8D;
-    expected[50] = 64'h3FEFFFFFD6FFE120;
+    expected[50] = 64'h3feffffde7210bea;  // 64'h3FEFFFFFD6FFE120;
     test_name[50] = "1.0 + (-1e-6) = 0.999999";
 
 
@@ -359,14 +359,6 @@ module FPAdder_tb;
       end else begin
         $display("Test %2d: FAIL - %s", i, test_name[i]);
         $display("         Expected: %h, Got: %h", expected[i], out);
-        $display("debugging....");
-        $display("M_2: 0%b", M_2);
-        $display("M_1: 0%b", M_1);
-        $display("M_3: %b", temp_mantissa);
-        $display("M_4: %b", shifted_mantissa);
-        $display("Added?: %b", add);
-        $display("Shifted G, R, S: %b %b %b", G_1, R_1, S_1);
-        $display("ROunded in subtraction? %b", round_sub);
         failed = failed + 1;
       end
     end
